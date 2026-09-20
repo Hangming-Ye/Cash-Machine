@@ -1,16 +1,7 @@
 # Secrets — never commit
 .env
 .env.local
-.env.*
-*.env
-!.env.example
 *.pem
-*.key
-
-# Agent runtime state; keep project skills versioned
-.agents/*
-!.agents/skills/
-.codex/
 
 # Python
 .venv/
@@ -31,7 +22,6 @@ htmlcov/
 data/
 *.sqlite
 *.db
-tmp/
 
 # Editors / OS
 .idea/

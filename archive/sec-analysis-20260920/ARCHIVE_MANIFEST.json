@@ -1,0 +1,288 @@
+{
+  "ArchivedOn": "2026-09-20",
+  "SourceCommit": "bc158600ee45cda3ac9ce55bff30327a520dd8e0",
+  "SourceBranch": "main",
+  "Purpose": "Reference-only legacy data-fetching implementation; not a new-system compatibility requirement",
+  "Files": [
+    {
+      "Path": ".env.example",
+      "Sha256": "f435b5d4c99dd8071584a57256515c474e283078164a7541c7541e1c5632d429"
+    },
+    {
+      "Path": ".gitignore",
+      "Sha256": "fa651313c96558a95836446a1964f523f254f4de55689fa90650c799becc3c61"
+    },
+    {
+      "Path": "README.md",
+      "Sha256": "edf0f28dada7da4705ca23fe631907bbac6b3012c8e30b8fa38ae1e2395a758f"
+    },
+    {
+      "Path": "docs/calling-guide.md",
+      "Sha256": "09181ac1691d22c09bfa35d2d039cb2aee6b0dfa401bc2c188f0175014a0a5ab"
+    },
+    {
+      "Path": "pyproject.toml",
+      "Sha256": "2ca3c9dacb5553ed785a85504cb3e177bfb8cbfa7cda76b6789fc390dadb90ea"
+    },
+    {
+      "Path": "src/sec_analysis/__init__.py",
+      "Sha256": "aab4b14f223a7597e5edd19314c2f2ec465d5c0adc9acb0038501714fa87b169"
+    },
+    {
+      "Path": "src/sec_analysis/__main__.py",
+      "Sha256": "4657be769fadbb525606709cfbce8e5c6e564c9b2199fc977805c3a5cefdd0d9"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/__init__.py",
+      "Sha256": "e70370c609aef6ddb5e5c9aa16e7f16448e541639bc5dcc17c0e06682f195b8c"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/ibkr/__init__.py",
+      "Sha256": "53a54adc93793b66477d3de5c30a13af5ed495e8edf90da671afc121f471dadd"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/ibkr/flex.py",
+      "Sha256": "98cfb0dfa7c75969c57f93e67f30b6f23519e269a105094a0150fe1b6bb4aa12"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/ibkr/readonly_client.py",
+      "Sha256": "44eca646c82ea8783c7461f735d6dcc5c2f89bc404b671a91c2c7c64885f6478"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/ibkr/safety.py",
+      "Sha256": "abca19c07c869f22cdcf5fb706c8e6769fd9684d20999d067d2f938f1218c073"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/longbridge/__init__.py",
+      "Sha256": "c7544ab0761922a5c80cd865cf48fbc4ed16980be5e58e472082e9101b7762b6"
+    },
+    {
+      "Path": "src/sec_analysis/brokers/longbridge/readonly_client.py",
+      "Sha256": "7c873d773249e66f7963e6ae167cc7012fe7a7aaa71d4e59b043de18af7873c7"
+    },
+    {
+      "Path": "src/sec_analysis/cli.py",
+      "Sha256": "b97be8c8f442ee423cda9fa064e0fbd946e534026c45301b0ee7d35a0edf327b"
+    },
+    {
+      "Path": "src/sec_analysis/client.py",
+      "Sha256": "53f25dce31741637f8043810ab0e9c5e6e1b4ed0b67f6c9e75eefdb185010c36"
+    },
+    {
+      "Path": "src/sec_analysis/config.py",
+      "Sha256": "0c2fcb13d1e2bf16b2d56f8bd86eac741316618ed4e6ebfcc6bc08a51d2d4e1e"
+    },
+    {
+      "Path": "src/sec_analysis/core/__init__.py",
+      "Sha256": "9de331239abef5fcccc5e4df8c631b5096bb9e9f1488a14c79c37863b5b70338"
+    },
+    {
+      "Path": "src/sec_analysis/core/errors.py",
+      "Sha256": "b02f1175e2f5e0e0bd9e389d90981da6c71a09b7afe0f0758930f8e30e0709b9"
+    },
+    {
+      "Path": "src/sec_analysis/core/instrument.py",
+      "Sha256": "3d07e57f8888fcc0913b4042a9c5581ff25adf10561718aa6a05bf9395233174"
+    },
+    {
+      "Path": "src/sec_analysis/core/interfaces.py",
+      "Sha256": "75b6e6d98bb53fd727946634909442656359c761dce13c28bfdeba3c657a6195"
+    },
+    {
+      "Path": "src/sec_analysis/core/models.py",
+      "Sha256": "fcb7ba1f1dada0b9f108b558d317fd5092277cf1106503cfaa6ba66282325e46"
+    },
+    {
+      "Path": "src/sec_analysis/core/rate_limit.py",
+      "Sha256": "6a540e7838e0ec79214f650b31599906e2826107877e85ffd282f78096f94a1d"
+    },
+    {
+      "Path": "src/sec_analysis/providers/__init__.py",
+      "Sha256": "f0031c2b6e399c1c668b22fe3750bf4e2449606cd7df956a8520b55032f8f5b7"
+    },
+    {
+      "Path": "src/sec_analysis/providers/akshare_provider/__init__.py",
+      "Sha256": "e5124ca35b7086acdc25c769c95578f6209702a0f8967116b87b4293a541fec2"
+    },
+    {
+      "Path": "src/sec_analysis/providers/akshare_provider/client.py",
+      "Sha256": "2f6f5e5991e14d81c35642fafa5c243826ea0f7d41d19deaf732c43729b398ad"
+    },
+    {
+      "Path": "src/sec_analysis/providers/akshare_provider/fundamentals.py",
+      "Sha256": "171096f73cfb73541a5e7a13b7d04c428824613114878b5502f75bb846653b78"
+    },
+    {
+      "Path": "src/sec_analysis/providers/akshare_provider/news.py",
+      "Sha256": "a804f11986139883b4cc451ba6351456ecf2cb2896725670cd7a9d1b2519dc37"
+    },
+    {
+      "Path": "src/sec_analysis/providers/eodhd/__init__.py",
+      "Sha256": "72863e3ed5158fe0c7952ea2bac403efb5555912b0af5e91688c3d1e41605a69"
+    },
+    {
+      "Path": "src/sec_analysis/providers/fallback.py",
+      "Sha256": "5cccd4f5071f2b398dd78e5a2b9def1b5bd97753c23dca18acac425adfdfb7c9"
+    },
+    {
+      "Path": "src/sec_analysis/providers/finnhub/__init__.py",
+      "Sha256": "a04731f401ab25244f58eec2012f1fb4b7c8f9ceadc1d7991710e18a1666d2d3"
+    },
+    {
+      "Path": "src/sec_analysis/providers/finnhub/client.py",
+      "Sha256": "1e03e2f40b724cd42a950b3414e2ce782cbfd362b309f37b9f610b93a2974da8"
+    },
+    {
+      "Path": "src/sec_analysis/providers/fmp/__init__.py",
+      "Sha256": "adfe9b91f705da0770875d9d37d64e5cf57c45f21e8b24729dfd05783fdf200e"
+    },
+    {
+      "Path": "src/sec_analysis/providers/fmp/client.py",
+      "Sha256": "04b212e4dc7d9f230208ed5cbbed6310f18da4e1eec94a9ab1267bbd2cf2c3f0"
+    },
+    {
+      "Path": "src/sec_analysis/providers/fundamentals_router.py",
+      "Sha256": "3d9c49fcf01c0190741dcb17d53f9fd8df568d9f50ae31e98a5f3a898ff09ab7"
+    },
+    {
+      "Path": "src/sec_analysis/providers/massive/__init__.py",
+      "Sha256": "aab6d7226281199c307e33f2e270444c7bfbceb94aa832dcf49813e2fb532eca"
+    },
+    {
+      "Path": "src/sec_analysis/providers/massive/client.py",
+      "Sha256": "e18124db43a5e99a7709a443ffda14fee10cac3aa9e9e5da61f72b2fff6298dc"
+    },
+    {
+      "Path": "src/sec_analysis/providers/minimal.py",
+      "Sha256": "c1b4e106a6c0df1d5b8ebcc023ef7a4b1af5a5d578a8cdf49259c7f36c7b7553"
+    },
+    {
+      "Path": "src/sec_analysis/providers/news_router.py",
+      "Sha256": "082762411f17110017996d9615cbbc15b473bfe76214462aaf36c339d3db5c9b"
+    },
+    {
+      "Path": "src/sec_analysis/providers/registry.py",
+      "Sha256": "c3ba20fe751173fe8d4cbe48f24c08fa0d1799bcd1d79be9df09384790dfe9f1"
+    },
+    {
+      "Path": "src/sec_analysis/providers/router.py",
+      "Sha256": "22f2a3432dd59c5cfccfa337a45292500bdea01ff771bb7313fec9490d97c72c"
+    },
+    {
+      "Path": "src/sec_analysis/providers/rss_news/__init__.py",
+      "Sha256": "3844de84a19be2c28b814c327aba557d40a91ef3ef55e9656324de901610f9ab"
+    },
+    {
+      "Path": "src/sec_analysis/providers/rss_news/client.py",
+      "Sha256": "7c57222f4c98420707d971b250df084bd99e4e0d7bed69e90fcc653a2dc5a747"
+    },
+    {
+      "Path": "src/sec_analysis/providers/stub/__init__.py",
+      "Sha256": "0c560e89bb0f33765716d6ded880a407a0054a1f596b3406a382cfde710c4a11"
+    },
+    {
+      "Path": "src/sec_analysis/providers/tiingo/__init__.py",
+      "Sha256": "46171fb87abc8ca56560434a3b362da0e87c9188b914560bba8aa830997cf4e0"
+    },
+    {
+      "Path": "src/sec_analysis/providers/tiingo/client.py",
+      "Sha256": "ac853148db8cfb6d7334d01eb5b4772e7333180ecc2d630d4538d815402d24a2"
+    },
+    {
+      "Path": "src/sec_analysis/providers/twelvedata/__init__.py",
+      "Sha256": "51231ae4337dc45046bd42244ad125867a5cceb52d667853c06dfe73ea388b58"
+    },
+    {
+      "Path": "src/sec_analysis/providers/yfinance_provider/__init__.py",
+      "Sha256": "a428d857fccc17f83f1d23c0ad0ea0d07ef255531ff10bb513e903048466e7b7"
+    },
+    {
+      "Path": "src/sec_analysis/providers/yfinance_provider/client.py",
+      "Sha256": "9aa49d54f8b72e294410376b467e53415f1b7e15aee2344fc77d57d824907e9a"
+    },
+    {
+      "Path": "src/sec_analysis/py.typed",
+      "Sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "Path": "src/sec_analysis/storage/__init__.py",
+      "Sha256": "86cbc15fbc4f5a06713297c61addea054345c4efeedd80086da210c35210ab91"
+    },
+    {
+      "Path": "src/sec_analysis/storage/cache.py",
+      "Sha256": "e238ff61c5d4438acdeb21f6d0b9f7489c87d8dfb8b217f6a011b9ccfdb92411"
+    },
+    {
+      "Path": "tests/conftest.py",
+      "Sha256": "623e4ff7c7e74ff0dfec0bab541160ca625b66079d8ded0d40906f124881567c"
+    },
+    {
+      "Path": "tests/test_akshare.py",
+      "Sha256": "dfed0cf42008189e83170f7c5b652fa26e6e3605de206780aea48de2b56216f6"
+    },
+    {
+      "Path": "tests/test_akshare_fundamentals.py",
+      "Sha256": "849e7464f6b4d4771f27d390d400cdaf6d1ad2fc8f96f6ed1de6c2c5c5eef4c1"
+    },
+    {
+      "Path": "tests/test_akshare_news.py",
+      "Sha256": "7332155b12161b7de79710df097f98349a29e3b793536fd3293210767bbefa69"
+    },
+    {
+      "Path": "tests/test_broker_safety.py",
+      "Sha256": "f60b5020181b4e063f7b4c6c3c6ac35c69a7d105872bb7b0da2923c5fac30121"
+    },
+    {
+      "Path": "tests/test_cli.py",
+      "Sha256": "206092788152abb263343a5e461d9ea2d15dde0476006789e6238c5ece8b8026"
+    },
+    {
+      "Path": "tests/test_client.py",
+      "Sha256": "1006165b040f9e7d809ec2e1f4ef6af481b36683bc4b5784829f522ec837d19d"
+    },
+    {
+      "Path": "tests/test_config_registry_storage.py",
+      "Sha256": "c8e3a8d2aa7796043933c25e690e2990ef15b6e2da22280880a48cba479a3908"
+    },
+    {
+      "Path": "tests/test_finnhub.py",
+      "Sha256": "9db136b8f4057ee94875894d1d0dd2ace64cbd6325f931071707c320d092f77e"
+    },
+    {
+      "Path": "tests/test_flex.py",
+      "Sha256": "235af56d0b7e964133335cf92bb52eb8a967095d1d58d20e0fca67746cc38834"
+    },
+    {
+      "Path": "tests/test_fmp_rss_yfinance.py",
+      "Sha256": "252dcfd8adc28a55af9527c1d865642ec4ee3ce5d5901e3a40d7ed28fcfd7ca4"
+    },
+    {
+      "Path": "tests/test_instrument_router.py",
+      "Sha256": "e9822f4ba130d9a1a2869bdb020da61fbfd3c676fc3487476be3e9bda2bcb58d"
+    },
+    {
+      "Path": "tests/test_interfaces.py",
+      "Sha256": "32493045bfe3c6aed925c7d7e919835d6f9355b5b9873428974379fe0fabdde4"
+    },
+    {
+      "Path": "tests/test_longbridge.py",
+      "Sha256": "0f520a1e533d373c70c46b5ce77074358e005131f9e202345e6f7741872d007b"
+    },
+    {
+      "Path": "tests/test_rate_limit.py",
+      "Sha256": "9e41483a0b0d0c0172852bcf9832fccefaf335cc6cc9d2387e55517ac45f4964"
+    },
+    {
+      "Path": "tests/test_stub_providers.py",
+      "Sha256": "7205b3150a91f7a2b71748f9b32c1b6272a58e508cc9ba375d9ec985070ab7ba"
+    },
+    {
+      "Path": "tests/test_tiingo.py",
+      "Sha256": "059a0a0d2327b8625bfb2f427f51775d7947231af8b0808eb4a0fded5f8a9db8"
+    },
+    {
+      "Path": "uv.lock",
+      "Sha256": "937825f6acae9878dc8515ae658f190ac8df028486a816c8a4054acce739a742"
+    }
+  ]
+}

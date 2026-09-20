@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cash-machine.local/schemas/bot-result-v0.3.json",
+  "title": "Financial research task result v0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "task_type", "instruction_version", "snapshot_id", "status", "answer", "findings", "missing", "next_step", "result"],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "task_type": {"enum": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08"]},
+    "instruction_version": {"const": "0.3"},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["done", "partial", "blocked"]},
+    "answer": {"type": "string"},
+    "findings": {"type": "array", "maxItems": 5, "items": {"$ref": "#/$defs/finding"}},
+    "missing": {"type": "array", "items": {"$ref": "#/$defs/missingItem"}},
+    "next_step": {"$ref": "#/$defs/textOrNull"},
+    "result": {"type": ["object", "null"]}
+  },
+  "allOf": [
+    {"if": {"properties": {"task_type": {"const": "T01"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t01"}}}},
+    {"if": {"properties": {"task_type": {"const": "T02"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t02"}}}},
+    {"if": {"properties": {"task_type": {"const": "T03"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t03"}}}},
+    {"if": {"properties": {"task_type": {"const": "T04"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t04"}}}},
+    {"if": {"properties": {"task_type": {"const": "T05"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t05"}}}},
+    {"if": {"properties": {"task_type": {"const": "T06"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t06"}}}},
+    {"if": {"properties": {"task_type": {"const": "T07"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t07"}}}},
+    {"if": {"properties": {"task_type": {"const": "T08"}, "status": {"enum": ["done", "partial"]}}}, "then": {"properties": {"result": {"$ref": "#/$defs/t08"}}}}
+  ],
+  "$defs": {
+    "textOrNull": {"type": ["string", "null"]},
+    "numberOrNull": {"type": ["number", "null"]},
+    "idArray": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "textArray": {"type": "array", "items": {"type": "string"}},
+    "rangeOrNull": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "object", "additionalProperties": false, "required": ["low", "high"], "properties": {"low": {"type": "number"}, "high": {"type": "number"}}}
+      ]
+    },
+    "numericValue": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "number"},
+        {"type": "object", "additionalProperties": false, "required": ["low", "high"], "properties": {"low": {"type": "number"}, "high": {"type": "number"}}}
+      ]
+    },
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "statement", "kind", "evidence_ids"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string"},
+        "kind": {"enum": ["reported_fact", "management_statement", "analyst_opinion", "rumor", "calculated", "interpretation", "assumption"]},
+        "evidence_ids": {"$ref": "#/$defs/idArray"}
+      }
+    },
+    "missingItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item", "affects", "required"],
+      "properties": {"item": {"type": "string"}, "affects": {"type": "string"}, "required": {"type": "boolean"}}
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["event", "original_source_ids", "event_time", "category", "factual_change", "expectation_change", "affected_driver", "thesis_effect", "evidence_ids"],
+      "properties": {
+        "event": {"type": "string"}, "original_source_ids": {"$ref": "#/$defs/idArray"}, "event_time": {"$ref": "#/$defs/textOrNull"},
+        "category": {"$ref": "#/$defs/textOrNull"}, "factual_change": {"$ref": "#/$defs/textOrNull"}, "expectation_change": {"$ref": "#/$defs/textOrNull"},
+        "affected_driver": {"$ref": "#/$defs/textOrNull"}, "thesis_effect": {"$ref": "#/$defs/textOrNull"}, "evidence_ids": {"$ref": "#/$defs/idArray"}
+      }
+    },
+    "expectationMetric": {
+      "type": "object", "additionalProperties": false,
+      "required": ["metric", "period", "unit", "actual", "prior_guidance", "pre_release_consensus", "evidence_ids", "calculation_ids"],
+      "properties": {
+        "metric": {"type": "string"}, "period": {"type": "string"}, "unit": {"type": "string"},
+        "actual": {"$ref": "#/$defs/numericValue"}, "prior_guidance": {"$ref": "#/$defs/numericValue"}, "pre_release_consensus": {"$ref": "#/$defs/numericValue"},
+        "evidence_ids": {"$ref": "#/$defs/idArray"}, "calculation_ids": {"$ref": "#/$defs/idArray"}
+      }
+    },
+    "t01": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "events", "price_context", "social_context", "next_checks"],
+      "properties": {
+        "mode": {"enum": ["event", "earnings", "preview", "macro"]},
+        "events": {"type": "array", "items": {"$ref": "#/$defs/event"}},
+        "price_context": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["calculation_ids", "interpretation"], "properties": {"calculation_ids": {"$ref": "#/$defs/idArray"}, "interpretation": {"type": "string"}}}]},
+        "social_context": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["coverage", "main_narratives", "opposing_narrative", "independent_origins"], "properties": {"coverage": {"type": "string"}, "main_narratives": {"$ref": "#/$defs/textArray"}, "opposing_narrative": {"$ref": "#/$defs/textOrNull"}, "independent_origins": {"type": "integer", "minimum": 0}}}]},
+        "next_checks": {"type": "array", "maxItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["question", "source_type", "due"], "properties": {"question": {"type": "string"}, "source_type": {"$ref": "#/$defs/textOrNull"}, "due": {"$ref": "#/$defs/textOrNull"}}}},
+        "actual_vs_expectations": {"type": "array", "items": {"$ref": "#/$defs/expectationMetric"}},
+        "earnings_quality": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["assessment", "drivers", "evidence_ids", "calculation_ids"], "properties": {"assessment": {"enum": ["clean", "mixed", "distorted", "unknown"]}, "drivers": {"$ref": "#/$defs/textArray"}, "evidence_ids": {"$ref": "#/$defs/idArray"}, "calculation_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "guidance_change": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["direction", "summary", "evidence_ids"], "properties": {"direction": {"enum": ["raised", "maintained", "lowered", "initiated", "withdrawn", "mixed", "unknown"]}, "summary": {"type": "string"}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "expectation_bar": {"type": "array", "items": {"$ref": "#/$defs/expectationMetric"}},
+        "kpi_thresholds": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["metric", "condition", "origin", "evidence_ids"], "properties": {"metric": {"type": "string"}, "condition": {"$ref": "#/$defs/textOrNull"}, "origin": {"enum": ["inherited", "draft"]}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}},
+        "exposures": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["entity", "exposure", "transmission", "valuation_variable", "evidence_ids"], "properties": {"entity": {"type": "string"}, "exposure": {"$ref": "#/$defs/textOrNull"}, "transmission": {"$ref": "#/$defs/textOrNull"}, "valuation_variable": {"$ref": "#/$defs/textOrNull"}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}}
+      },
+      "allOf": [
+        {"if": {"properties": {"mode": {"const": "earnings"}}}, "then": {"required": ["actual_vs_expectations", "earnings_quality", "guidance_change"]}},
+        {"if": {"properties": {"mode": {"const": "preview"}}}, "then": {"required": ["expectation_bar", "kpi_thresholds"]}},
+        {"if": {"properties": {"mode": {"const": "macro"}}}, "then": {"required": ["exposures"]}}
+      ]
+    },
+    "t02": {
+      "type": "object", "additionalProperties": false,
+      "required": ["business_engine", "drivers", "thesis", "counter_case", "proof_points"],
+      "properties": {
+        "business_engine": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["segment", "customer", "product", "economic_mechanism", "evidence_ids"], "properties": {"segment": {"$ref": "#/$defs/textOrNull"}, "customer": {"$ref": "#/$defs/textOrNull"}, "product": {"$ref": "#/$defs/textOrNull"}, "economic_mechanism": {"$ref": "#/$defs/textOrNull"}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "drivers": {"type": "array", "maxItems": 3, "items": {"type": "object", "additionalProperties": false, "required": ["driver", "baseline", "source_ids", "assumed_change", "transmission"], "properties": {"driver": {"type": "string"}, "baseline": {"$ref": "#/$defs/textOrNull"}, "source_ids": {"$ref": "#/$defs/idArray"}, "assumed_change": {"$ref": "#/$defs/textOrNull"}, "transmission": {"$ref": "#/$defs/textOrNull"}}}},
+        "thesis": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["status", "rationale"], "properties": {"status": {"enum": ["early", "supported", "mixed", "rejected", "unknown"]}, "rationale": {"type": "string"}}}]},
+        "counter_case": {"$ref": "#/$defs/textOrNull"},
+        "proof_points": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["metric_or_event", "source", "due_window", "confirm", "disconfirm"], "properties": {"metric_or_event": {"type": "string"}, "source": {"$ref": "#/$defs/textOrNull"}, "due_window": {"$ref": "#/$defs/textOrNull"}, "confirm": {"$ref": "#/$defs/textOrNull"}, "disconfirm": {"$ref": "#/$defs/textOrNull"}}}}
+      }
+    },
+    "t03": {
+      "type": "object", "additionalProperties": false,
+      "required": ["system_map", "bottleneck_hypothesis", "candidates", "rejected_alternative"],
+      "properties": {
+        "system_map": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["from", "to", "relation", "evidence_ids"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "relation": {"type": "string"}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}},
+        "bottleneck_hypothesis": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["mechanism", "evidence_ids"], "properties": {"mechanism": {"type": "string"}, "supporting_evidence": {"$ref": "#/$defs/idArray"}, "contrary_evidence": {"$ref": "#/$defs/idArray"}, "duration": {"$ref": "#/$defs/textOrNull"}, "substitution": {"$ref": "#/$defs/textOrNull"}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "candidates": {"type": "array", "maxItems": 3, "items": {"type": "object", "additionalProperties": false, "required": ["security_id", "chain_role", "maturity_stage", "exposure_evidence", "profit_hypothesis", "status", "next_proof"], "properties": {"security_id": {"$ref": "#/$defs/textOrNull"}, "entity": {"$ref": "#/$defs/textOrNull"}, "chain_role": {"type": "string"}, "maturity_stage": {"enum": ["development", "sampling", "qualification", "production", "order", "shipment", "revenue", "unknown"]}, "exposure_evidence": {"$ref": "#/$defs/idArray"}, "profit_hypothesis": {"$ref": "#/$defs/textOrNull"}, "status": {"enum": ["lead", "deepen", "reject", "unknown"]}, "next_proof": {"$ref": "#/$defs/textOrNull"}}}},
+        "rejected_alternative": {"$ref": "#/$defs/textOrNull"}
+      }
+    },
+    "scenarioInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scenario", "inputs"],
+      "properties": {"scenario": {"enum": ["bear", "base", "bull"]}, "inputs": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["metric", "value", "unit", "period", "origin", "evidence_ids"], "properties": {"metric": {"type": "string"}, "value": {"$ref": "#/$defs/numericValue"}, "unit": {"type": "string"}, "period": {"type": "string"}, "origin": {"enum": ["source", "assumption"]}, "evidence_ids": {"$ref": "#/$defs/idArray"}}}}}
+    },
+    "t04": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "method", "peer_rationale", "scenario_inputs", "calculation_ids", "valuation_read", "sensitivities", "missing_inputs"],
+      "properties": {
+        "mode": {"enum": ["assumptions", "interpretation"]}, "method": {"$ref": "#/$defs/textOrNull"}, "peer_rationale": {"$ref": "#/$defs/textOrNull"},
+        "scenario_inputs": {"type": "array", "items": {"$ref": "#/$defs/scenarioInput"}}, "calculation_ids": {"$ref": "#/$defs/idArray"},
+        "valuation_read": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["fair_value_range", "entry_ceiling", "downside", "currency", "horizon", "interpretation"], "properties": {"fair_value_range": {"$ref": "#/$defs/rangeOrNull"}, "entry_ceiling": {"$ref": "#/$defs/numberOrNull"}, "downside": {"type": ["number", "null"], "description": "Return relative to the current quote as a decimal, e.g. -0.2 means -20%; null when no qualifying quote exists."}, "currency": {"$ref": "#/$defs/textOrNull"}, "horizon": {"$ref": "#/$defs/textOrNull"}, "interpretation": {"type": "string"}}}]},
+        "sensitivities": {"$ref": "#/$defs/textArray"}, "missing_inputs": {"$ref": "#/$defs/textArray"}
+      }
+    },
+    "t05": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "decision_use", "hypothesis", "registered_factor_ids", "protocol_id", "experiment_ids", "incremental_value", "evidence_level", "failure_regimes", "next_test"],
+      "properties": {
+        "mode": {"enum": ["proposal", "interpretation"]}, "decision_use": {"type": "string"}, "hypothesis": {"type": "string"},
+        "registered_factor_ids": {"type": "array", "maxItems": 2, "items": {"type": "string"}, "uniqueItems": true}, "protocol_id": {"$ref": "#/$defs/textOrNull"}, "experiment_ids": {"$ref": "#/$defs/idArray"},
+        "incremental_value": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["primary_metric", "value", "unit", "baseline", "uncertainty", "costs_included"], "properties": {"primary_metric": {"type": "string"}, "value": {"$ref": "#/$defs/numberOrNull"}, "unit": {"$ref": "#/$defs/textOrNull"}, "baseline": {"$ref": "#/$defs/textOrNull"}, "uncertainty": {"$ref": "#/$defs/textOrNull"}, "costs_included": {"type": ["boolean", "null"]}}}]},
+        "evidence_level": {"enum": ["descriptive", "exploratory", "out_of_sample", "prospective", "rejected", "unknown"]}, "failure_regimes": {"$ref": "#/$defs/textArray"}, "next_test": {"$ref": "#/$defs/textOrNull"}
+      }
+    },
+    "t06": {
+      "type": "object", "additionalProperties": false,
+      "required": ["changes", "company_thesis", "research_stance", "readiness", "position_action", "price_conditions", "factor_relevance", "counter_case", "next_review"],
+      "properties": {
+        "changes": {"type": "object", "additionalProperties": false, "required": ["facts", "expectations", "price"], "properties": {"facts": {"$ref": "#/$defs/textArray"}, "expectations": {"$ref": "#/$defs/textArray"}, "price": {"$ref": "#/$defs/textArray"}}},
+        "company_thesis": {"$ref": "#/$defs/textOrNull"}, "research_stance": {"type": ["string", "null"], "enum": ["BUY", "SELL", "WATCH", null]},
+        "readiness": {"enum": ["ready", "conditional", "insufficient"]},
+        "position_action": {"type": ["string", "null"], "enum": ["new", "add", "hold", "trim", "exit", "avoid", null]},
+        "price_conditions": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["fair_value_range", "entry_ceiling", "reduction_conditions", "exit_conditions", "currency", "horizon", "calculation_ids"], "properties": {"fair_value_range": {"$ref": "#/$defs/rangeOrNull"}, "entry_ceiling": {"$ref": "#/$defs/numberOrNull"}, "reduction_conditions": {"$ref": "#/$defs/textArray"}, "exit_conditions": {"$ref": "#/$defs/textArray"}, "currency": {"$ref": "#/$defs/textOrNull"}, "horizon": {"$ref": "#/$defs/textOrNull"}, "calculation_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "factor_relevance": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["evidence_level", "summary", "horizon"], "properties": {"evidence_level": {"enum": ["descriptive", "exploratory", "out_of_sample", "prospective", "rejected", "unknown"]}, "summary": {"type": "string"}, "horizon": {"$ref": "#/$defs/textOrNull"}}}]},
+        "counter_case": {"$ref": "#/$defs/textOrNull"}, "next_review": {"$ref": "#/$defs/textOrNull"}
+      }
+    },
+    "t07": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verdict", "issues", "strongest_counter_case", "accepted_scope"],
+      "properties": {
+        "verdict": {"enum": ["pass", "revise", "blocked"]},
+        "issues": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["claim_or_field", "severity", "evidence_or_calculation_ids", "finding", "required_repair", "affected_output"], "properties": {"claim_or_field": {"type": "string"}, "severity": {"enum": ["blocking", "material", "minor"]}, "evidence_or_calculation_ids": {"$ref": "#/$defs/idArray"}, "finding": {"type": "string"}, "required_repair": {"type": "string"}, "affected_output": {"type": "string"}}}},
+        "strongest_counter_case": {"$ref": "#/$defs/textOrNull"}, "accepted_scope": {"$ref": "#/$defs/textOrNull"}
+      }
+    },
+    "t08": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "decision_id", "blinding_status", "process_assessment", "outcome_assessment", "error_category", "lesson_candidate", "reopen_condition"],
+      "properties": {
+        "mode": {"enum": ["process", "outcome"]}, "decision_id": {"type": "string"}, "blinding_status": {"enum": ["blinded", "unblinded", "not_applicable", "unknown"]},
+        "process_assessment": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["quality", "summary", "missed_evidence", "unknowable_events"], "properties": {"quality": {"enum": ["sound", "mixed", "weak", "unknown"]}, "summary": {"type": "string"}, "missed_evidence": {"$ref": "#/$defs/textArray"}, "unknowable_events": {"$ref": "#/$defs/textArray"}}}]},
+        "outcome_assessment": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["status", "summary", "calculation_ids"], "properties": {"status": {"enum": ["pending", "complete", "unknown"]}, "summary": {"type": "string"}, "calculation_ids": {"$ref": "#/$defs/idArray"}}}]},
+        "error_category": {"type": ["string", "null"], "enum": ["data", "logic", "valuation", "timing", "execution", "exogenous", "mixed", "none", "unknown", null]},
+        "lesson_candidate": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["lesson", "supporting_cases", "conditions", "counterexamples", "validation_plan"], "properties": {"lesson": {"type": "string"}, "supporting_cases": {"$ref": "#/$defs/idArray"}, "conditions": {"$ref": "#/$defs/textArray"}, "counterexamples": {"$ref": "#/$defs/textArray"}, "validation_plan": {"type": "string"}}}]},
+        "reopen_condition": {"$ref": "#/$defs/textOrNull"}
+      }
+    }
+  }
+}
