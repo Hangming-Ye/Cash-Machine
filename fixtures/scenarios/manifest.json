@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "evidence_level": "synthetic",
+  "description": "Synthetic acceptance mapping only; entries are not executed evidence.",
+  "markets": ["us", "hk", "cn"],
+  "research_types": ["supply_chain", "portfolio", "factor"],
+  "core_cases": [
+    {"id": "core-us-supply-chain", "market": "us", "research_type": "supply_chain", "status": "not_run", "fixture_owner": "T035"},
+    {"id": "core-hk-supply-chain", "market": "hk", "research_type": "supply_chain", "status": "not_run", "fixture_owner": "T035"},
+    {"id": "core-cn-supply-chain", "market": "cn", "research_type": "supply_chain", "status": "not_run", "fixture_owner": "T035"},
+    {"id": "core-us-portfolio", "market": "us", "research_type": "portfolio", "status": "not_run", "fixture_owner": "T026/T029/T033"},
+    {"id": "core-hk-portfolio", "market": "hk", "research_type": "portfolio", "status": "not_run", "fixture_owner": "T026/T029/T033"},
+    {"id": "core-cn-portfolio", "market": "cn", "research_type": "portfolio", "status": "not_run", "fixture_owner": "T026/T029/T033"},
+    {"id": "core-us-factor", "market": "us", "research_type": "factor", "status": "not_run", "fixture_owner": "T040/T048"},
+    {"id": "core-hk-factor", "market": "hk", "research_type": "factor", "status": "not_run", "fixture_owner": "T040/T048"},
+    {"id": "core-cn-factor", "market": "cn", "research_type": "factor", "status": "not_run", "fixture_owner": "T040/T048"}
+  ],
+  "exception_cases": [
+    {"id": "exception-preferred-source-failure", "kind": "preferred_source_failure", "status": "not_run", "fixture_owner": "T017/T024"},
+    {"id": "exception-critical-source-conflict", "kind": "critical_source_conflict", "status": "not_run", "fixture_owner": "T017/T024/T035"},
+    {"id": "exception-insufficient-history", "kind": "insufficient_history", "status": "not_run", "fixture_owner": "T017/T040"},
+    {"id": "exception-no-qualified-opportunity", "kind": "no_qualified_opportunity", "status": "not_run", "fixture_owner": "T035"},
+    {"id": "exception-no-factor-increment", "kind": "no_factor_increment", "status": "not_run", "fixture_owner": "T040/T046"},
+    {"id": "exception-scope-change", "kind": "scope_change", "status": "not_run", "fixture_owner": "T013/T057"},
+    {"id": "exception-invocation-failure", "kind": "invocation_failure", "status": "not_run", "fixture_owner": "T016/T058"},
+    {"id": "exception-broker-read-failure", "kind": "broker_read_failure", "status": "not_run", "fixture_owner": "T026/T033"}
+  ],
+  "memory_cases": [
+    {"id": "memory-periodic-delta", "kind": "periodic_delta", "path": "fixtures/scenarios/periodic-delta", "status": "not_run", "fixture_owner": "T050"},
+    {"id": "memory-long-term-thesis", "kind": "long_term_thesis", "path": "fixtures/scenarios/long-term-thesis", "status": "not_run", "fixture_owner": "T050"},
+    {"id": "memory-deep-analysis-revision", "kind": "deep_analysis_revision", "path": "fixtures/scenarios/deep-analysis-revision", "status": "not_run", "fixture_owner": "T050"}
+  ],
+  "fixture_workflow": [
+    {"id": "evidence_ingest", "template": "fixtures/requests/evidence-ingest.json", "template_owner": "T022", "command": ["data", "ingest"], "request_option": "--request", "captures": {"evidence_id": {"artifact_types": ["evidence"], "source": "artifact_id"}}},
+    {"id": "memory_recall", "template": "fixtures/requests/memory-recall.json", "template_owner": "T011", "command": ["memory", "recall"], "request_option": "--request", "captures": {"memory_packet_id": {"artifact_types": ["memory_packet"], "source": "artifact_id"}, "expected_version": {"artifact_types": ["memory_state"], "source": "json", "keys": ["expected_version", "current_version"]}}},
+    {"id": "valuation", "template": "fixtures/requests/valuation.json", "template_owner": "T029", "command": ["compute", "valuation"], "request_option": "--request", "captures": {"calculation_id": {"artifact_types": ["valuation", "calculation"], "source": "artifact_id"}}},
+    {"id": "factor", "template": "fixtures/requests/factor-new-combination.json", "template_owner": "T048", "command": ["compute", "factor"], "request_option": "--request", "captures": {"experiment_id": {"artifact_types": ["factor_experiment"], "source": "artifact_id"}}},
+    {"id": "artifact_archive", "template": "fixtures/requests/report-check.json", "template_owner": "T032", "command": ["check", "artifact"], "request_option": "--request", "trailing_args": ["--archive"], "captures": {"record_id": {"artifact_types": ["decision", "work_record", "review", "archived_record"], "source": "artifact_id"}}},
+    {"id": "memory_apply", "template": "fixtures/requests/memory-update.json", "template_owner": "T011", "command": ["memory", "apply"], "request_option": "--proposal", "captures": {"updated_version": {"artifact_types": ["topic_summary", "lesson", "memory_update"], "source": "json", "keys": ["version"]}}}
+  ]
+}

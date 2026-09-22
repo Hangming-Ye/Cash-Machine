@@ -1,0 +1,334 @@
+{
+  "schema_version": "1.0",
+  "fixture_scope": "synthetic_static_artifact_contract_only",
+  "semantic_validation": "required_in_later_reviewer_and_native_bot_cases",
+  "native_acceptance_case_count": 0,
+  "market_manifest": {
+    "US": ["theme-only-discovery", "no-qualified-opportunity"],
+    "HK": ["candidate-rejected-by-counterevidence"],
+    "CN": ["conflicting-evidence"]
+  },
+  "program_checks": [
+    "required structure, typed Evidence and Decision fields",
+    "aware source and availability times",
+    "claim references resolve to a frozen source and locator",
+    "default validation does not archive",
+    "explicit archive generates immutable record IDs and report links"
+  ],
+  "program_does_not_check": [
+    "whether a synthetic claim is economically true",
+    "whether the chain analysis is complete enough for a live investment decision",
+    "whether Grok Bot autonomously discovered or challenged a candidate",
+    "whether any case counts toward the nine native acceptance cases"
+  ],
+  "cases": [
+    {
+      "case_id": "theme-only-discovery",
+      "market": "US",
+      "user_question_zh": "只从数据中心液冷需求这个主题出发，找出可能的瓶颈、替代路线和需要继续验证的公司，不预先指定公司。",
+      "horizon": "18 months",
+      "synthetic_entities": ["AtlasFlow Components"],
+      "expected_outcome": {
+        "research_status": "early_lead",
+        "execution_outcome": "complete",
+        "candidate_status": "deepen",
+        "reason": "A traceable early lead exists, but profit contribution and valuation remain unproven."
+      },
+      "materials": [
+        {
+          "material_id": "us-demand-disclosure",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_company_disclosure",
+          "title": "Synthetic operator deployment note",
+          "origin_url": "https://example.test/us-demand-disclosure",
+          "locator": "/text",
+          "published_at": "2026-02-01T14:00:00Z",
+          "retrieved_at": "2026-02-02T02:00:00Z",
+          "available_at": "2026-02-01T14:00:00Z",
+          "units": ["synthetic_rack_count"],
+          "limitations": ["fictional disclosure; deployment intent is not installed capacity"],
+          "text": "The fictional operator plans 120 high-density racks and says coolant distribution qualification is unfinished."
+        },
+        {
+          "material_id": "us-substitute-view",
+          "content_kind": "third_party_view",
+          "source_type": "synthetic_industry_note",
+          "title": "Synthetic cooling substitution note",
+          "origin_url": "https://example.test/us-substitute-view",
+          "locator": "/text",
+          "published_at": "2026-02-03T15:00:00Z",
+          "retrieved_at": "2026-02-03T16:00:00Z",
+          "available_at": "2026-02-03T15:00:00Z",
+          "units": [],
+          "limitations": ["third-party opinion; no audited capacity table"],
+          "text": "The fictional analyst argues rear-door heat exchangers could defer part of direct-liquid demand."
+        },
+        {
+          "material_id": "us-company-filing",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_company_filing",
+          "title": "AtlasFlow synthetic segment filing",
+          "origin_url": "https://example.test/us-company-filing",
+          "locator": "/text",
+          "published_at": "2026-02-05T21:00:00Z",
+          "retrieved_at": "2026-02-06T01:00:00Z",
+          "available_at": "2026-02-05T21:00:00Z",
+          "units": ["USD", "percent_of_revenue"],
+          "limitations": ["fictional filing; theme revenue and margins are not separately reported"],
+          "text": "AtlasFlow reports USD 40 million of thermal-component revenue but does not separate liquid-cooling products or margins."
+        }
+      ],
+      "analysis_chain": [
+        {"step": "demand", "claim_type": "fact", "statement": "The synthetic deployment plan creates a possible increment in high-density cooling demand.", "evidence_refs": ["us-demand-disclosure"], "semantic_expectation": "Do not convert a plan into installed demand.", "review_required": true},
+        {"step": "bottleneck_or_substitute", "claim_type": "inference", "statement": "Qualification, rather than raw component capacity, is the current bottleneck hypothesis; rear-door systems are a substitute.", "evidence_refs": ["us-demand-disclosure", "us-substitute-view"], "semantic_expectation": "A reviewer must test both the qualification bottleneck and substitution timing.", "review_required": true},
+        {"step": "company_exposure", "claim_type": "fact", "statement": "AtlasFlow has thermal-component exposure, but the liquid-cooling share is unknown.", "evidence_refs": ["us-company-filing"], "semantic_expectation": "Do not infer material theme exposure from the segment label alone.", "review_required": true},
+        {"step": "profit_and_valuation", "claim_type": "inference", "statement": "Profit contribution and valuation impact cannot yet be supported.", "evidence_refs": ["us-company-filing"], "semantic_expectation": "Unknown product mix and margin must remain explicit.", "review_required": true},
+        {"step": "countercase", "claim_type": "opinion", "statement": "Substitution could delay direct-liquid adoption and remove the proposed bottleneck.", "evidence_refs": ["us-substitute-view"], "semantic_expectation": "Treat the analyst statement as a view, not a disclosed fact.", "review_required": true},
+        {"step": "next_check", "claim_type": "inference", "statement": "Obtain qualification milestones, product revenue mix, margin, and customer timing before candidate promotion.", "evidence_refs": ["us-demand-disclosure", "us-company-filing"], "semantic_expectation": "The next check must resolve exposure and commercial realization.", "review_required": true}
+      ],
+      "decision": {
+        "security_or_topic": "synthetic US data-center liquid cooling",
+        "as_of": "2026-02-06T01:00:00Z",
+        "label": "watch",
+        "price_or_conditions": null,
+        "price_or_conditions_reason": "An early lead lacks product-mix, margin, and valuation evidence.",
+        "evidence_limited": true,
+        "limitations": ["synthetic materials", "theme revenue and valuation are unresolved"],
+        "horizon": "18 months",
+        "risks": ["substitution", "qualification delay", "capacity response"],
+        "invalidators": ["qualification ceases to constrain deployment", "theme revenue remains immaterial"]
+      }
+    },
+    {
+      "case_id": "candidate-rejected-by-counterevidence",
+      "market": "HK",
+      "user_question_zh": "验证海上储能连接器主题中的虚构港股候选，重点找出会推翻受益逻辑的证据。",
+      "horizon": "12 months",
+      "synthetic_entities": ["HarborFlux Holdings"],
+      "expected_outcome": {
+        "research_status": "candidate_rejected",
+        "execution_outcome": "complete",
+        "candidate_status": "reject",
+        "reason": "Counterevidence shows no qualified product and no supported profit transmission."
+      },
+      "materials": [
+        {
+          "material_id": "hk-demand-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_project_notice",
+          "title": "Synthetic offshore storage tender",
+          "origin_url": "https://example.test/hk-demand-fact",
+          "locator": "/text",
+          "published_at": "2026-03-01T01:00:00Z",
+          "retrieved_at": "2026-03-01T02:00:00Z",
+          "available_at": "2026-03-01T01:00:00Z",
+          "units": ["synthetic_project_count"],
+          "limitations": ["fictional tender; award and commissioning are not proven"],
+          "text": "A fictional tender requests connectors for two offshore storage projects."
+        },
+        {
+          "material_id": "hk-company-counterevidence",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_company_filing",
+          "title": "HarborFlux synthetic filing",
+          "origin_url": "https://example.test/hk-company-counterevidence",
+          "locator": "/text",
+          "published_at": "2026-03-04T08:00:00Z",
+          "retrieved_at": "2026-03-04T09:00:00Z",
+          "available_at": "2026-03-04T08:00:00Z",
+          "units": ["HKD", "percent_of_revenue"],
+          "limitations": ["fictional filing"],
+          "text": "HarborFlux says its offshore connector remains pre-qualification, has zero related revenue, and requires material capex before production."
+        },
+        {
+          "material_id": "hk-substitute-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_tender_appendix",
+          "title": "Synthetic tender approved-vendor appendix",
+          "origin_url": "https://example.test/hk-substitute-fact",
+          "locator": "/text",
+          "published_at": "2026-03-05T01:00:00Z",
+          "retrieved_at": "2026-03-05T02:00:00Z",
+          "available_at": "2026-03-05T01:00:00Z",
+          "units": [],
+          "limitations": ["fictional appendix; later vendor changes remain possible"],
+          "text": "The fictional appendix lists qualified substitute vendors and does not list HarborFlux."
+        }
+      ],
+      "analysis_chain": [
+        {"step": "demand", "claim_type": "fact", "statement": "The fictional tender indicates project demand but not an award.", "evidence_refs": ["hk-demand-fact"], "semantic_expectation": "Separate requested equipment from awarded revenue.", "review_required": true},
+        {"step": "bottleneck_or_substitute", "claim_type": "fact", "statement": "Qualified substitutes already exist in the synthetic appendix.", "evidence_refs": ["hk-substitute-fact"], "semantic_expectation": "Existing qualified supply weakens a scarcity claim.", "review_required": true},
+        {"step": "company_exposure", "claim_type": "fact", "statement": "HarborFlux is pre-qualification, absent from the vendor list, and has zero related revenue.", "evidence_refs": ["hk-company-counterevidence", "hk-substitute-fact"], "semantic_expectation": "Do not advance pre-qualification into production exposure.", "review_required": true},
+        {"step": "profit_and_valuation", "claim_type": "inference", "statement": "No profit or valuation benefit is supportable because commercialization requires capex and has no revenue baseline.", "evidence_refs": ["hk-company-counterevidence"], "semantic_expectation": "Zero revenue is not filled with a forecast.", "review_required": true},
+        {"step": "countercase", "claim_type": "inference", "statement": "The approved substitutes and absent qualification directly contradict the candidate thesis.", "evidence_refs": ["hk-company-counterevidence", "hk-substitute-fact"], "semantic_expectation": "This counterevidence should reject rather than merely weaken the candidate.", "review_required": true},
+        {"step": "next_check", "claim_type": "inference", "statement": "Reconsider only after documented qualification and a funded production plan.", "evidence_refs": ["hk-company-counterevidence"], "semantic_expectation": "The next check is conditional and does not preserve a positive candidate claim.", "review_required": true}
+      ],
+      "decision": {
+        "security_or_topic": "synthetic HK offshore storage connector candidate",
+        "as_of": "2026-03-05T02:00:00Z",
+        "label": "watch",
+        "price_or_conditions": null,
+        "price_or_conditions_reason": "The candidate is rejected; a price conclusion is not applicable.",
+        "evidence_limited": false,
+        "limitations": ["synthetic materials"],
+        "horizon": "12 months",
+        "risks": ["qualification failure", "capex funding", "qualified substitutes"],
+        "invalidators": ["documented qualification and funded production would require a new record"]
+      }
+    },
+    {
+      "case_id": "conflicting-evidence",
+      "market": "CN",
+      "user_question_zh": "研究工业机器人减速器扩产主题，若公司说法与客户材料冲突，要保留冲突并限制结论。",
+      "horizon": "24 months",
+      "synthetic_entities": ["Jinghe Motion"],
+      "expected_outcome": {
+        "research_status": "evidence_limited",
+        "execution_outcome": "limited",
+        "candidate_status": "unknown",
+        "reason": "Conflicting qualification evidence prevents a complete candidate conclusion."
+      },
+      "materials": [
+        {
+          "material_id": "cn-demand-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_industry_disclosure",
+          "title": "Synthetic robot production plan",
+          "origin_url": "https://example.test/cn-demand-fact",
+          "locator": "/text",
+          "published_at": "2026-04-01T01:00:00Z",
+          "retrieved_at": "2026-04-01T02:00:00Z",
+          "available_at": "2026-04-01T01:00:00Z",
+          "units": ["synthetic_robot_units"],
+          "limitations": ["fictional plan; realized production is unknown"],
+          "text": "A fictional industry disclosure plans higher robot output and names reducer yield as a monitoring item."
+        },
+        {
+          "material_id": "cn-company-claim",
+          "content_kind": "third_party_view",
+          "source_type": "synthetic_management_interview",
+          "title": "Jinghe Motion synthetic interview",
+          "origin_url": "https://example.test/cn-company-claim",
+          "locator": "/text",
+          "published_at": "2026-04-03T02:00:00Z",
+          "retrieved_at": "2026-04-03T03:00:00Z",
+          "available_at": "2026-04-03T02:00:00Z",
+          "units": ["percent_of_revenue"],
+          "limitations": ["management statement; no customer confirmation or segment reconciliation"],
+          "text": "Management claims qualification at a major customer and expects reducer revenue to become material."
+        },
+        {
+          "material_id": "cn-customer-conflict",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_customer_notice",
+          "title": "Synthetic customer qualification notice",
+          "origin_url": "https://example.test/cn-customer-conflict",
+          "locator": "/text",
+          "published_at": "2026-04-04T06:00:00Z",
+          "retrieved_at": "2026-04-04T07:00:00Z",
+          "available_at": "2026-04-04T06:00:00Z",
+          "units": [],
+          "limitations": ["fictional notice; supplier alias matching requires confirmation"],
+          "text": "The fictional customer notice lists Jinghe Motion as testing, not qualified production supply."
+        }
+      ],
+      "analysis_chain": [
+        {"step": "demand", "claim_type": "fact", "statement": "The synthetic production plan indicates possible reducer demand growth.", "evidence_refs": ["cn-demand-fact"], "semantic_expectation": "Plans do not prove realized volume.", "review_required": true},
+        {"step": "bottleneck_or_substitute", "claim_type": "inference", "statement": "Reducer yield is a possible bottleneck, but capacity and substitute response are unknown.", "evidence_refs": ["cn-demand-fact"], "semantic_expectation": "A monitoring item alone does not prove durable scarcity.", "review_required": true},
+        {"step": "company_exposure", "claim_type": "conflict", "statement": "Management says qualified while the customer notice says testing; the exposure stage is unresolved.", "evidence_refs": ["cn-company-claim", "cn-customer-conflict"], "semantic_expectation": "Preserve both sources and do not choose the favorable version without reconciliation.", "review_required": true},
+        {"step": "profit_and_valuation", "claim_type": "inference", "statement": "Material revenue, margin, and valuation impact cannot be supported while qualification is unresolved.", "evidence_refs": ["cn-company-claim", "cn-customer-conflict"], "semantic_expectation": "Management expectation is not a calculation result.", "review_required": true},
+        {"step": "countercase", "claim_type": "inference", "statement": "The customer-stage evidence contradicts production qualification and may eliminate near-term profit transmission.", "evidence_refs": ["cn-customer-conflict"], "semantic_expectation": "The conflict limits the entire candidate conclusion.", "review_required": true},
+        {"step": "next_check", "claim_type": "inference", "statement": "Reconcile supplier identity and obtain dated customer qualification plus segment revenue evidence.", "evidence_refs": ["cn-company-claim", "cn-customer-conflict"], "semantic_expectation": "Do not close the conflict from a later undated summary.", "review_required": true}
+      ],
+      "decision": {
+        "security_or_topic": "synthetic CN robot reducer exposure",
+        "as_of": "2026-04-04T07:00:00Z",
+        "label": "watch",
+        "price_or_conditions": null,
+        "price_or_conditions_reason": "Conflicting qualification evidence prevents a supported valuation condition.",
+        "evidence_limited": true,
+        "limitations": ["synthetic materials", "qualification conflict unresolved", "profit contribution unknown"],
+        "horizon": "24 months",
+        "risks": ["qualification failure", "yield improvement by competitors", "capacity response"],
+        "invalidators": ["customer evidence confirms the company never advanced beyond testing"]
+      }
+    },
+    {
+      "case_id": "no-qualified-opportunity",
+      "market": "US",
+      "user_question_zh": "评估模块化电网变压器主题；如果需求存在但没有公司同时满足敞口、利润和估值证据，就明确给出无合格机会。",
+      "horizon": "3 years",
+      "synthetic_entities": ["Northstar Gridworks", "ModuCore Systems"],
+      "expected_outcome": {
+        "research_status": "no_qualified_opportunity",
+        "execution_outcome": "complete",
+        "candidate_status": "none",
+        "reason": "The method completed, but neither fictional company has a traceable exposure-profit-valuation chain."
+      },
+      "materials": [
+        {
+          "material_id": "noopp-demand-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_grid_plan",
+          "title": "Synthetic grid replacement plan",
+          "origin_url": "https://example.test/noopp-demand-fact",
+          "locator": "/text",
+          "published_at": "2026-05-01T13:00:00Z",
+          "retrieved_at": "2026-05-01T14:00:00Z",
+          "available_at": "2026-05-01T13:00:00Z",
+          "units": ["synthetic_transformer_units"],
+          "limitations": ["fictional plan; procurement schedule may change"],
+          "text": "A fictional utility plan describes a need for 500 replacement transformer modules over three years."
+        },
+        {
+          "material_id": "noopp-northstar-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_company_filing",
+          "title": "Northstar synthetic filing",
+          "origin_url": "https://example.test/noopp-northstar-fact",
+          "locator": "/text",
+          "published_at": "2026-05-03T20:00:00Z",
+          "retrieved_at": "2026-05-03T21:00:00Z",
+          "available_at": "2026-05-03T20:00:00Z",
+          "units": ["USD"],
+          "limitations": ["fictional filing; no modular product revenue"],
+          "text": "Northstar reports conventional transformer backlog but no modular product, qualification, or modular revenue."
+        },
+        {
+          "material_id": "noopp-moducore-fact",
+          "content_kind": "disclosure_fact",
+          "source_type": "synthetic_company_filing",
+          "title": "ModuCore synthetic filing",
+          "origin_url": "https://example.test/noopp-moducore-fact",
+          "locator": "/text",
+          "published_at": "2026-05-04T20:00:00Z",
+          "retrieved_at": "2026-05-04T21:00:00Z",
+          "available_at": "2026-05-04T20:00:00Z",
+          "units": ["USD"],
+          "limitations": ["fictional filing; valuation comparison is unavailable"],
+          "text": "ModuCore has a prototype but states commercial shipments, production margin, and funding are unresolved."
+        }
+      ],
+      "analysis_chain": [
+        {"step": "demand", "claim_type": "fact", "statement": "The synthetic utility plan establishes a proposed demand pool, not completed procurement.", "evidence_refs": ["noopp-demand-fact"], "semantic_expectation": "Preserve schedule uncertainty.", "review_required": true},
+        {"step": "bottleneck_or_substitute", "claim_type": "inference", "statement": "Qualification and production funding may constrain supply, while conventional transformers remain substitutes.", "evidence_refs": ["noopp-northstar-fact", "noopp-moducore-fact"], "semantic_expectation": "Do not infer a durable bottleneck from two company examples.", "review_required": true},
+        {"step": "company_exposure", "claim_type": "fact", "statement": "Northstar lacks a modular product and ModuCore remains at prototype stage.", "evidence_refs": ["noopp-northstar-fact", "noopp-moducore-fact"], "semantic_expectation": "Neither company has documented commercial exposure.", "review_required": true},
+        {"step": "profit_and_valuation", "claim_type": "inference", "statement": "Neither candidate has both profit-transmission evidence and a supported valuation comparison.", "evidence_refs": ["noopp-northstar-fact", "noopp-moducore-fact"], "semantic_expectation": "Absence of evidence is reported rather than filled with estimates.", "review_required": true},
+        {"step": "countercase", "claim_type": "inference", "statement": "Conventional backlog and unresolved prototype economics counter a near-term modular equity opportunity.", "evidence_refs": ["noopp-northstar-fact", "noopp-moducore-fact"], "semantic_expectation": "Demand can exist without a qualified listed opportunity.", "review_required": true},
+        {"step": "next_check", "claim_type": "inference", "statement": "Monitor procurement awards, qualification, funded production, segment margin, and valuation evidence without forcing a candidate.", "evidence_refs": ["noopp-demand-fact", "noopp-moducore-fact"], "semantic_expectation": "No-opportunity is a completed research outcome, not an execution failure.", "review_required": true}
+      ],
+      "decision": {
+        "security_or_topic": "synthetic US modular grid transformer theme",
+        "as_of": "2026-05-04T21:00:00Z",
+        "label": "no_opportunity",
+        "price_or_conditions": null,
+        "price_or_conditions_reason": "No fictional candidate has a supported exposure-profit-valuation chain.",
+        "evidence_limited": false,
+        "limitations": ["synthetic materials", "no qualified opportunity found"],
+        "horizon": "3 years",
+        "risks": ["procurement delay", "conventional substitution", "prototype funding"],
+        "invalidators": ["a new immutable record documents qualification, commercial shipments, economics, and valuation"]
+      }
+    }
+  ]
+}
