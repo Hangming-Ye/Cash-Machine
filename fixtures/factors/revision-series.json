@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "synthetic-revision-series-v1",
+  "synthetic": true,
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+  "bar_interval": "event",
+  "adjustment_status": "not_applicable_reported_value",
+  "revision_status": "two_synthetic_revisions_preserved",
+  "point_in_time_status": "synthetic_explicit_availability_not_live_certification",
+  "fields": {
+    "reported_value": {"unit": "USD million", "observed_at": "period_end", "available_at": "available_at", "revision": "revision_id"}
+  },
+  "rows": [
+    {"period_end": "2025-12-31", "available_at": "2026-01-06T08:00:00-05:00", "revision_id": "initial", "reported_value": 100.0},
+    {"period_end": "2025-12-31", "available_at": "2026-01-10T08:00:00-05:00", "revision_id": "revised", "reported_value": 90.0}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "synthetic-zero-divide-v1",
+  "synthetic": true,
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+  "bar_interval": "1d",
+  "adjustment_status": "not_applicable_ratio_inputs",
+  "revision_status": "frozen_fixture_v1",
+  "point_in_time_status": "synthetic_explicit_availability_not_live_certification",
+  "fields": {
+    "numerator": {"unit": "USD/share", "observed_at": "timestamp", "available_at": "available_at"},
+    "denominator": {"unit": "USD/share", "observed_at": "timestamp", "available_at": "available_at"}
+  },
+  "rows": [
+    {"timestamp": "2026-01-05T16:00:00-05:00", "available_at": "2026-01-05T16:05:00-05:00", "numerator": 2.0, "denominator": 1.0},
+    {"timestamp": "2026-01-06T16:00:00-05:00", "available_at": "2026-01-06T16:05:00-05:00", "numerator": 3.0, "denominator": 0.0},
+    {"timestamp": "2026-01-07T16:00:00-05:00", "available_at": "2026-01-07T16:05:00-05:00", "numerator": 4.0, "denominator": 2.0}
+  ]
+}

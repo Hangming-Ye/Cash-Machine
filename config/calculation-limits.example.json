@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "expression_limits": {
+    "max_depth": 64,
+    "max_nodes": 4096,
+    "max_parameters": 256,
+    "max_parameter_sets_per_batch": 128,
+    "max_estimated_cells_per_batch": 5000000,
+    "max_estimated_bytes_per_batch": 160000000,
+    "estimated_bytes_per_cell": 16
+  },
+  "measurement": {
+    "basis": "T040 synthetic fixture compilation on 2026-09-21",
+    "case_count": 6,
+    "maximum_nodes": 10,
+    "maximum_depth": 5,
+    "maximum_rows": 6,
+    "maximum_explicit_parameter_sets": 2,
+    "maximum_estimated_cells": 120,
+    "maximum_estimated_bytes": 1920,
+    "note": "Estimates use nodes * max(rows, 1) * explicit parameter sets and 16 bytes per cell. They are planning estimates, not memory or runtime guarantees. There is no overall trial-count cap."
+  },
+  "split_boundary": "Parameter sets may be split losslessly under one trial group. Any row partition requires T045 to preserve prior history and state, rolling overlap, as-of eligibility, and label/split boundaries; chunks must not reset history."
+}

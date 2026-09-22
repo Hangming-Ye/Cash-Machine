@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "synthetic-factor-30m-v1",
+  "synthetic": true,
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+  "bar_interval": "30m",
+  "market_timezone": "America/New_York",
+  "adjustment_status": "synthetic_unadjusted",
+  "revision_status": "frozen_fixture_v1",
+  "point_in_time_status": "synthetic_explicit_row_availability_not_live_certification",
+  "fields": {
+    "close": {"unit": "USD/share", "observed_at": "timestamp", "available_at": "available_at"}
+  },
+  "rows": [
+    {"timestamp": "2026-01-05T09:30:00-05:00", "available_at": "2026-01-05T10:01:00-05:00", "close": 100.0},
+    {"timestamp": "2026-01-05T10:00:00-05:00", "available_at": "2026-01-05T10:31:00-05:00", "close": 101.0},
+    {"timestamp": "2026-01-05T10:30:00-05:00", "available_at": "2026-01-05T11:01:00-05:00", "close": 102.0},
+    {"timestamp": "2026-01-05T11:00:00-05:00", "available_at": "2026-01-05T11:31:00-05:00", "close": 101.0},
+    {"timestamp": "2026-01-05T11:30:00-05:00", "available_at": "2026-01-05T12:01:00-05:00", "close": 103.0},
+    {"timestamp": "2026-01-05T12:00:00-05:00", "available_at": "2026-01-05T12:31:00-05:00", "close": 104.0}
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "evidence_level": "contract_and_hand_calculation_only",
+  "engine_status": "not_implemented_by_T040",
+  "contract": {
+    "required_request_fields": [
+      "request_id", "security", "hypothesis", "failure_regimes", "dataset_ref",
+      "expression", "parameter_schema", "parameter_sets", "target", "target_spec",
+      "horizon", "bar_interval", "baseline", "baseline_spec", "available_time_rule",
+      "split", "primary_metric", "costs", "trial_group"
+    ],
+    "ast_node_keys": ["op", "args", "params"],
+    "allowed_operations": [
+      "field", "constant", "add", "subtract", "multiply", "safe_divide", "abs", "sign", "log", "clip",
+      "gt", "gte", "lt", "lte", "and", "or", "where", "weighted_sum",
+      "lag", "delta", "pct_return", "log_return",
+      "rolling_sum", "rolling_mean", "rolling_median", "rolling_min", "rolling_max", "rolling_std",
+      "rolling_quantile", "rolling_rank", "rolling_corr", "rolling_cov", "ewm_mean", "ewm_std",
+      "asof_value", "event_age"
+    ],
+    "binding_form": {"bind": "parameter_name"},
+    "constant_requires_unit": true,
+    "field_units_from_dataset_schema": true,
+    "precision": {"absolute_tolerance": 1e-12, "rounding": "none_before_comparison"},
+    "trial_rules": {
+      "count_each_comparable_formula_parameter_horizon_threshold_or_preprocessing_variant": true,
+      "failed_and_abandoned_trials_count": true,
+      "infrastructure_retry_without_changed_research_input_does_not_count": true,
+      "replay_requires_replay_of": true,
+      "viewed_final_holdout_cannot_be_reused_as_unseen": true
+    }
+  },
+  "cases": {
+    "new_combination": {
+      "fixture_scope": "full_request_contract",
+      "request_ref": "data/factor-requests/factor-new-combination.json",
+      "fixture_locator": "/cases/new_combination/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "f30b4b37d98efa7cacf6969cd8556f34eeaf55bfa598da21c433d81a24da2559",
+      "request": {
+        "request_id": "factor-new-combination",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "A volume anomaly conditions one-bar price momentum without defining a new primitive.",
+        "failure_regimes": ["low-liquidity prints", "corporate-action volume discontinuity", "mean-reverting event days"],
+        "dataset_ref": "fixtures/factors/series-1d.json",
+        "expression": {
+          "op": "where",
+          "args": [
+            {"op": "gt", "args": [
+              {"op": "safe_divide", "args": [
+                {"op": "field", "args": [], "params": {"name": "volume"}},
+                {"op": "rolling_mean", "args": [{"op": "field", "args": [], "params": {"name": "volume"}}], "params": {"window": {"bind": "volume_window"}, "min_periods": {"bind": "volume_window"}}}
+              ], "params": {}},
+              {"op": "constant", "args": [], "params": {"value": {"bind": "volume_threshold"}, "unit": "dimensionless"}}
+            ], "params": {}},
+            {"op": "pct_return", "args": [{"op": "field", "args": [], "params": {"name": "close"}}], "params": {"periods": {"bind": "return_periods"}}},
+            {"op": "constant", "args": [], "params": {"value": 0.0, "unit": "decimal_return"}}
+          ],
+          "params": {}
+        },
+        "parameter_schema": {
+          "volume_window": {"type": "integer", "unit": "bars", "minimum": 1},
+          "volume_threshold": {"type": "number", "unit": "dimensionless"},
+          "return_periods": {"type": "integer", "unit": "bars", "minimum": 1}
+        },
+        "parameter_sets": [
+          {"parameter_set_id": "p-window2", "bindings": {"volume_window": 2, "volume_threshold": 1.4, "return_periods": 1}},
+          {"parameter_set_id": "p-window3", "bindings": {"volume_window": 3, "volume_threshold": 1.6, "return_periods": 1}}
+        ],
+        "target": "forward_return:close:1bar",
+        "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "1bar",
+        "bar_interval": "1d",
+        "baseline": "unconditional_same_security_forward_return",
+        "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution", "target": "forward_return:close:1bar"},
+        "available_time_rule": "each feature row is usable only at max(input available_at); close signal earliest use is next bar",
+        "split": {
+          "kind": "ordered",
+          "train": {"start": "2026-01-05", "end": "2026-01-06"},
+          "validation": {"start": "2026-01-07", "end": "2026-01-08"},
+          "final_holdout": {"start": "2026-01-09", "end": "2026-01-12"},
+          "label_boundary_rule": "drop sample when label_end is after its partition end",
+          "fit_scope": "train_only",
+          "final_holdout_reuse": "forbidden_after_view"
+        },
+        "primary_metric": "directional_accuracy",
+        "costs": {"commission_bps": 2.0, "slippage_bps": 3.0},
+        "trial_group": "synthetic-volume-conditioned-momentum-v1"
+      },
+      "expected": {
+        "parameter_outputs": {
+          "p-window2": [null, 0.0, -0.00980392156862745, 0.0, 0.009708737864077669, 0.0],
+          "p-window3": [null, null, -0.00980392156862745, 0.0, 0.0, 0.0]
+        },
+        "target_values": [0.02, -0.00980392156862745, 0.019801980198019802, 0.009708737864077669, 0.0, null],
+        "split_counts_by_parameter_set": {
+          "p-window2": {
+            "train": {"candidate": 2, "feature_available": 1, "label_within_partition": 1, "usable": 0},
+            "validation": {"candidate": 2, "feature_available": 2, "label_within_partition": 1, "usable": 1},
+            "final_holdout": {"candidate": 2, "feature_available": 2, "label_within_partition": 1, "usable": 1}
+          },
+          "p-window3": {
+            "train": {"candidate": 2, "feature_available": 0, "label_within_partition": 1, "usable": 0},
+            "validation": {"candidate": 2, "feature_available": 2, "label_within_partition": 1, "usable": 1},
+            "final_holdout": {"candidate": 2, "feature_available": 2, "label_within_partition": 1, "usable": 1}
+          }
+        },
+        "metric_scope": {"evaluation": "per_parameter_set_per_partition", "zero_signal": "abstain", "denominator": "non_null_nonzero_signal_with_label", "minimum_sample_status": "insufficient_for_effect_conclusion"},
+        "metrics": {"directional_accuracy": null},
+        "trial_count": {"planned": 2, "failed": 0, "replay": 0},
+        "future_truncation": {"cutoff_index": 3, "unchanged_prefix_parameter_set": "p-window2"}
+      }
+    },
+    "different_bar_interval": {
+      "fixture_scope": "full_request_contract",
+      "request_ref": "data/factor-requests/factor-30m-return.json",
+      "fixture_locator": "/cases/different_bar_interval/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "b5dec4628267c63329d14280cde9d6be0c2bc9f811e7b4f546ac030db024f0ce",
+      "request": {
+        "request_id": "factor-30m-return",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "Two-bar intraday momentum is a distinct time-granularity parameterized case.",
+        "failure_regimes": ["session boundary", "stale intraday bar"],
+        "dataset_ref": "fixtures/factors/series-30m.json",
+        "expression": {"op": "pct_return", "args": [{"op": "field", "args": [], "params": {"name": "close"}}], "params": {"periods": {"bind": "lookback_bars"}}},
+        "parameter_schema": {"lookback_bars": {"type": "integer", "unit": "bars", "minimum": 1}},
+        "parameter_sets": [{"parameter_set_id": "p-2bar", "bindings": {"lookback_bars": 2}}],
+        "target": "forward_return:close:2bar",
+        "target_spec": {"canonical_id": "forward_return:close:2bar", "operation": "forward_return", "field": "close", "horizon": 2, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "2bar",
+        "bar_interval": "30m",
+        "baseline": "unconditional_same_security_forward_return",
+        "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution", "target": "forward_return:close:2bar"},
+        "available_time_rule": "30m close is usable only after its row available_at; earliest action is the next bar",
+        "split": {"kind": "ordered", "train": {"start": "2026-01-05T09:30:00-05:00", "end": "2026-01-05T10:00:00-05:00"}, "validation": {"start": "2026-01-05T10:30:00-05:00", "end": "2026-01-05T11:00:00-05:00"}, "final_holdout": {"start": "2026-01-05T11:30:00-05:00", "end": "2026-01-05T12:00:00-05:00"}, "label_boundary_rule": "drop crossing labels", "fit_scope": "train_only", "final_holdout_reuse": "forbidden_after_view"},
+        "primary_metric": "mean_signal",
+        "costs": {"commission_bps": 2.0, "slippage_bps": 3.0},
+        "trial_group": "synthetic-30m-v1"
+      },
+      "expected": {
+        "factor_values": [null, null, 0.02, 0.0, 0.00980392156862745, 0.0297029702970297],
+        "target_values": [0.02, 0.0, 0.00980392156862745, 0.0297029702970297, null, null],
+        "metrics": {"mean_signal": 0.014876722966164288},
+        "trial_count": {"planned": 1, "failed": 0, "replay": 0}
+      }
+    },
+    "future_leakage": {
+      "fixture_scope": "operator_contract_only_missing_target_series",
+      "request_ref": "data/factor-requests/factor-future-leakage.json",
+      "fixture_locator": "/cases/future_leakage/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "6ebfc2383a94a90614cd6747b4ffafbb8c2652411f94174ca1925b23c7098426",
+      "request": {
+        "request_id": "factor-future-leakage",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "Event values must not appear before their explicit availability time.",
+        "failure_regimes": ["missing availability timestamp", "later revision treated as original"],
+        "dataset_ref": "fixtures/factors/event-availability.json",
+        "expression": {"op": "asof_value", "args": [{"op": "field", "args": [], "params": {"name": "event_value"}}], "params": {"observed_at_field": "observed_at", "available_at_field": "available_at"}},
+        "parameter_schema": {},
+        "parameter_sets": [{"parameter_set_id": "p-asof", "bindings": {}}],
+        "target": "forward_return:close:1bar",
+        "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "1bar",
+        "bar_interval": "1d",
+        "baseline": "unconditional_same_security_forward_return",
+        "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution", "target": "forward_return:close:1bar"},
+        "available_time_rule": "asof_value filters available_at <= decision_time; observed_at alone is insufficient",
+        "split": {"kind": "ordered", "train": {"start": "2026-01-05", "end": "2026-01-06"}, "validation": {"start": "2026-01-07", "end": "2026-01-08"}, "final_holdout": {"start": "2026-01-09", "end": "2026-01-12"}, "label_boundary_rule": "drop crossing labels", "fit_scope": "train_only", "final_holdout_reuse": "forbidden_after_view"},
+        "primary_metric": "eligible_observation_count",
+        "costs": {"commission_bps": 0.0, "slippage_bps": 0.0},
+        "trial_group": "synthetic-future-leakage-v1"
+      },
+      "expected": {
+        "execution_status": "not_executable_as_full_factor_experiment",
+        "asof_values": {"2026-01-06T16:00:00-05:00": null, "2026-01-08T08:00:00-05:00": 10.0, "2026-01-09T15:00:00-05:00": 10.0, "2026-01-09T16:10:00-05:00": 20.0},
+        "metrics": {"eligible_observation_count": 2.0},
+        "future_truncation": {"cutoff": "2026-01-08T08:00:00-05:00", "expected_value_before_and_after_appending_future_rows": 10.0},
+        "trial_count": {"planned": 1, "failed": 0, "replay": 0}
+      }
+    },
+    "zero_division": {
+      "fixture_scope": "operator_contract_only_missing_target_series",
+      "request_ref": "data/factor-requests/factor-zero-divide.json",
+      "fixture_locator": "/cases/zero_division/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "d327a8ced3ccc6db662e941c7ccac3fdac00cd20151a9b58ae784ab60e7bee76",
+      "request": {
+        "request_id": "factor-zero-divide",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "A ratio uses missing output rather than infinity when the denominator is zero.",
+        "failure_regimes": ["zero denominator", "unit mismatch"],
+        "dataset_ref": "fixtures/factors/zero-divide.json",
+        "expression": {"op": "safe_divide", "args": [{"op": "field", "args": [], "params": {"name": "numerator"}}, {"op": "field", "args": [], "params": {"name": "denominator"}}], "params": {}},
+        "parameter_schema": {},
+        "parameter_sets": [{"parameter_set_id": "p-ratio", "bindings": {}}],
+        "target": "forward_return:close:1bar",
+        "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "1bar",
+        "bar_interval": "1d",
+        "baseline": "unconditional_same_security_forward_return",
+        "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution", "target": "forward_return:close:1bar"},
+        "available_time_rule": "ratio is available at max(input available_at)",
+        "split": {"kind": "ordered", "train": {"start": "2026-01-05", "end": "2026-01-05"}, "validation": {"start": "2026-01-06", "end": "2026-01-06"}, "final_holdout": {"start": "2026-01-07", "end": "2026-01-07"}, "label_boundary_rule": "drop crossing labels", "fit_scope": "train_only", "final_holdout_reuse": "forbidden_after_view"},
+        "primary_metric": "valid_fraction",
+        "costs": {"commission_bps": 0.0, "slippage_bps": 0.0},
+        "trial_group": "synthetic-zero-divide-v1"
+      },
+      "expected": {
+        "execution_status": "not_executable_as_full_factor_experiment",
+        "factor_values": [2.0, null, 2.0],
+        "warnings": [{"row_index": 1, "reason": "division_by_zero"}],
+        "infinite_output_count": 0,
+        "metrics": {"valid_fraction": 0.6666666666666666},
+        "trial_count": {"planned": 1, "failed": 0, "replay": 0}
+      }
+    },
+    "revision_asof": {
+      "fixture_scope": "operator_contract_only_missing_target_series",
+      "request_ref": "data/factor-requests/factor-revision-asof.json",
+      "fixture_locator": "/cases/revision_asof/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "10439fad54c4ff0805620f68c2de2cd07e78c127bbc9c2ebc53afacd9f96c621",
+      "request": {
+        "request_id": "factor-revision-asof",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "Historical evaluation selects only the latest revision available at each decision time.",
+        "failure_regimes": ["timezone-less revision", "latest revision backfilled into history"],
+        "dataset_ref": "fixtures/factors/revision-series.json",
+        "expression": {"op": "asof_value", "args": [{"op": "field", "args": [], "params": {"name": "reported_value"}}], "params": {"observed_at_field": "period_end", "available_at_field": "available_at", "revision_field": "revision_id"}},
+        "parameter_schema": {},
+        "parameter_sets": [{"parameter_set_id": "p-revision", "bindings": {}}],
+        "target": "forward_return:close:1bar",
+        "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "1bar",
+        "bar_interval": "event",
+        "baseline": "unconditional_same_security_forward_return",
+        "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution", "target": "forward_return:close:1bar"},
+        "available_time_rule": "select max available_at <= decision_time within one observed period",
+        "split": {"kind": "ordered", "train": {"start": "2026-01-06", "end": "2026-01-08"}, "validation": {"start": "2026-01-09", "end": "2026-01-10"}, "final_holdout": {"start": "2026-01-11", "end": "2026-01-12"}, "label_boundary_rule": "drop crossing labels", "fit_scope": "train_only", "final_holdout_reuse": "forbidden_after_view"},
+        "primary_metric": "selected_value",
+        "costs": {"commission_bps": 0.0, "slippage_bps": 0.0},
+        "trial_group": "synthetic-revision-asof-v1"
+      },
+      "expected": {
+        "execution_status": "not_executable_as_full_factor_experiment",
+        "selected_values": {"2026-01-08T12:00:00-05:00": 100.0, "2026-01-12T12:00:00-05:00": 90.0},
+        "metrics": {"selected_value": 90.0},
+        "future_truncation": {"cutoff": "2026-01-08T12:00:00-05:00", "expected_value_before_and_after_later_revision": 100.0},
+        "trial_count": {"planned": 1, "failed": 0, "replay": 0}
+      }
+    },
+    "no_increment": {
+      "fixture_scope": "full_request_contract",
+      "request_ref": "data/factor-requests/factor-no-increment.json",
+      "fixture_locator": "/cases/no_increment/request",
+      "request_serialization": "canonical_json_utf8_v1",
+      "request_hash": "5b55453e0673170f2e38493f519cbb903a1f57effb7f38bf3dfb607235c0fff8",
+      "request": {
+        "request_id": "factor-no-increment",
+        "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+        "hypothesis": "The supplied directional signal adds accuracy over an always-positive baseline.",
+        "failure_regimes": ["balanced alternating outcomes", "turnover costs erase gross effect"],
+        "dataset_ref": "fixtures/factors/no-increment.json",
+        "expression": {"op": "field", "args": [], "params": {"name": "signal"}},
+        "parameter_schema": {},
+        "parameter_sets": [{"parameter_set_id": "p-signal", "bindings": {}}],
+        "target": "provided:forward_return:1bar",
+        "target_spec": {"canonical_id": "provided:forward_return:1bar", "operation": "provided_field", "field": "forward_return", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+        "horizon": "1bar",
+        "bar_interval": "1d",
+        "baseline": "always_positive_direction",
+        "baseline_spec": {"canonical_id": "always_positive_direction", "kind": "constant_direction", "value": 1.0, "unit": "direction"},
+        "available_time_rule": "signal uses row available_at; label is evaluation-only at label_available_at",
+        "split": {"kind": "ordered", "train": {"start": "2026-01-05", "end": "2026-01-05"}, "validation": {"start": "2026-01-06", "end": "2026-01-06"}, "final_holdout": {"start": "2026-01-07", "end": "2026-01-09"}, "label_boundary_rule": "drop rows whose label_available_at is after partition end", "fit_scope": "train_only", "final_holdout_reuse": "forbidden_after_view"},
+        "primary_metric": "directional_accuracy",
+        "costs": {"commission_bps": 2.0, "slippage_bps": 3.0},
+        "trial_group": "synthetic-no-increment-v1"
+      },
+      "expected": {
+        "descriptive_all_rows": {"signal_direction": [1, -1, 1, 1], "target_direction": [1, 1, -1, 1], "directional_accuracy": 0.5, "baseline_directional_accuracy": 0.75, "increment": -0.25},
+        "final_holdout": {"row_indices": [2, 3], "minimum_samples": 2, "sample_count": 2, "signal_direction": [1, 1], "target_direction": [-1, 1], "matches": [false, true]},
+        "metrics": {"directional_accuracy": 0.5, "baseline_directional_accuracy": 0.5, "increment": 0.0},
+        "conclusion": "no_factor_increment",
+        "trial_count": {"planned": 1, "failed": 0, "replay": 0}
+      }
+    }
+  },
+  "invalid_cases": {
+    "target_spec_mismatch": {
+      "target": "forward_return:close:1bar",
+      "target_spec": {"canonical_id": "forward_return:close:2bar", "operation": "forward_return", "field": "close", "horizon": 2, "horizon_unit": "bar", "unit": "decimal_return"},
+      "baseline": "unconditional_same_security_forward_return",
+      "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution"},
+      "expected_error": "target_spec_canonical_mismatch"
+    },
+    "target_semantic_mismatch": {
+      "target": "forward_return:close:1bar",
+      "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 2, "horizon_unit": "bar", "unit": "decimal_return"},
+      "horizon": "1bar",
+      "baseline": "unconditional_same_security_forward_return",
+      "baseline_spec": {"canonical_id": "unconditional_same_security_forward_return", "kind": "unconditional_distribution"},
+      "expected_error": "target_spec_semantic_mismatch"
+    },
+    "baseline_spec_mismatch": {
+      "target": "forward_return:close:1bar",
+      "target_spec": {"canonical_id": "forward_return:close:1bar", "operation": "forward_return", "field": "close", "horizon": 1, "horizon_unit": "bar", "unit": "decimal_return"},
+      "baseline": "always_positive_direction",
+      "baseline_spec": {"canonical_id": "always_negative_direction", "kind": "constant_direction", "value": -1.0, "unit": "direction"},
+      "expected_error": "baseline_spec_canonical_mismatch"
+    },
+    "unknown_operation": {
+      "expression": {"op": "python_eval", "args": [], "params": {"code": "future_data()"}},
+      "expected_error": "unsupported_operation"
+    },
+    "negative_lag": {
+      "expression": {"op": "lag", "args": [{"op": "field", "args": [], "params": {"name": "close"}}], "params": {"periods": -1}},
+      "expected_error": "negative_lookback"
+    }
+  },
+  "trial_ledger_example": {
+    "trial_group": "synthetic-ledger-v1",
+    "entries": [
+      {"trial_id": "trial-1", "parameter_set_id": "p1", "status": "completed", "replay_of": null, "counts_as_research_trial": true},
+      {"trial_id": "trial-2", "parameter_set_id": "p2", "status": "failed", "replay_of": null, "counts_as_research_trial": true},
+      {"trial_id": "trial-3", "parameter_set_id": "p3", "status": "abandoned_after_partial_result", "replay_of": null, "counts_as_research_trial": true},
+      {"trial_id": "trial-4", "parameter_set_id": "p1", "status": "infrastructure_replay", "replay_of": "trial-1", "counts_as_research_trial": false}
+    ],
+    "expected_counts": {"research_trials": 3, "failed_or_abandoned": 2, "replays": 1}
+  }
+}

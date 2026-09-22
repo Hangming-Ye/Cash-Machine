@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "synthetic-no-increment-v1",
+  "synthetic": true,
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+  "bar_interval": "1d",
+  "adjustment_status": "synthetic_unadjusted",
+  "revision_status": "frozen_fixture_v1",
+  "point_in_time_status": "synthetic_explicit_availability_not_live_certification",
+  "fields": {
+    "signal": {"unit": "direction", "observed_at": "timestamp", "available_at": "available_at"},
+    "forward_return": {"unit": "decimal_return", "observed_at": "timestamp", "available_at": "label_available_at"}
+  },
+  "rows": [
+    {"timestamp": "2026-01-05T16:00:00-05:00", "available_at": "2026-01-05T16:05:00-05:00", "label_available_at": "2026-01-06T16:05:00-05:00", "signal": 1.0, "forward_return": 0.01},
+    {"timestamp": "2026-01-06T16:00:00-05:00", "available_at": "2026-01-06T16:05:00-05:00", "label_available_at": "2026-01-07T16:05:00-05:00", "signal": -1.0, "forward_return": 0.01},
+    {"timestamp": "2026-01-07T16:00:00-05:00", "available_at": "2026-01-07T16:05:00-05:00", "label_available_at": "2026-01-08T16:05:00-05:00", "signal": 1.0, "forward_return": -0.01},
+    {"timestamp": "2026-01-08T16:00:00-05:00", "available_at": "2026-01-08T16:05:00-05:00", "label_available_at": "2026-01-09T16:05:00-05:00", "signal": 1.0, "forward_return": 0.01}
+  ]
+}

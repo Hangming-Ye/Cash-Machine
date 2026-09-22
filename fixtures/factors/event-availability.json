@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "synthetic-event-availability-v1",
+  "synthetic": true,
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNF", "currency": "USD"},
+  "bar_interval": "1d",
+  "adjustment_status": "not_applicable_event_table",
+  "revision_status": "frozen_fixture_v1",
+  "point_in_time_status": "synthetic_explicit_availability_not_live_certification",
+  "fields": {
+    "event_value": {"unit": "dimensionless", "observed_at": "observed_at", "available_at": "available_at"}
+  },
+  "rows": [
+    {"observed_at": "2026-01-05T16:00:00-05:00", "available_at": "2026-01-08T08:00:00-05:00", "event_value": 10.0},
+    {"observed_at": "2026-01-09T16:00:00-05:00", "available_at": "2026-01-09T16:10:00-05:00", "event_value": 20.0}
+  ]
+}
