@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexQueryResponse queryName="synthetic-empty" type="AF">
+  <FlexStatements count="1">
+    <FlexStatement accountId="SYNTH-IBKR-EMPTY" fromDate="20260917" toDate="20260918" whenGenerated="20260919;020000">
+      <AccountInformation accountId="SYNTH-IBKR-EMPTY" currency="USD" />
+      <OpenPositions />
+    </FlexStatement>
+  </FlexStatements>
+</FlexQueryResponse>

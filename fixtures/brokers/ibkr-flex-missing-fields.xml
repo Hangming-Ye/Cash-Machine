@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexQueryResponse queryName="synthetic-missing-fields" type="AF">
+  <FlexStatements count="1">
+    <FlexStatement>
+      <AccountInformation />
+      <CashReportCurrency endingCash="12.50" />
+    </FlexStatement>
+  </FlexStatements>
+</FlexQueryResponse>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexQueryResponse queryName="synthetic-readonly" type="AF">
+  <FlexStatements count="2">
+    <FlexStatement accountId="SYNTH-IBKR-A" fromDate="20260917" toDate="20260918" whenGenerated="20260919;020000">
+      <AccountInformation accountId="SYNTH-IBKR-A" currency="USD" />
+      <CashReportCurrency accountId="SYNTH-IBKR-A" currency="USD" endingCash="1250.25" netLiquidation="9250.25" />
+      <OpenPosition accountId="SYNTH-IBKR-A" symbol="ACME" assetCategory="STK" currency="USD" position="10" costBasisPrice="80" markPrice="90" positionValue="900" />
+      <Trade accountId="SYNTH-IBKR-A" tradeID="SYNTH-TRADE-A" symbol="ACME" buySell="BUY" quantity="10" tradePrice="80" dateTime="20260918;140000" currency="USD" />
+    </FlexStatement>
+    <FlexStatement accountId="SYNTH-IBKR-B" fromDate="20260917" toDate="20260918" whenGenerated="20260919;020000">
+      <AccountInformation accountId="SYNTH-IBKR-B" currency="EUR" />
+      <CashReportCurrency accountId="SYNTH-IBKR-B" currency="EUR" endingCash="500.50" netLiquidation="2500.50" />
+      <OpenPosition accountId="SYNTH-IBKR-B" symbol="EUCO" assetCategory="STK" currency="EUR" position="5" costBasisPrice="390" markPrice="400" positionValue="2000" />
+    </FlexStatement>
+  </FlexStatements>
+</FlexQueryResponse>

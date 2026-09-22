@@ -1,0 +1,353 @@
+{
+  "schema_version": "1.0",
+  "evidence_level": "synthetic",
+  "adapter_contract": {
+    "callable": "fetch(request, *, output_ref)",
+    "required_request_keys": ["request_id", "source", "operation", "subject", "as_of", "parameters", "required_fields"],
+    "required_result_keys": ["source_result", "raw_payload", "normalized", "evidence", "gaps"],
+    "broker_result_extensions": ["portfolio_snapshot"],
+    "allowed_operations": ["accounts", "positions", "executions"],
+    "forbidden_operations": ["submit_order", "replace_order", "cancel_order", "watchlist"],
+    "router_boundary": "CallResult wrapping is deferred to T033",
+    "credential_injection": "Settings is provided to the adapter constructor or call context; fetch never loads an implicit env file",
+    "payload_ref_contract": "caller provides a safe private relative output_ref; adapter returns exact raw_payload inline and T033 persists it before reporting CLI success"
+  },
+  "cases": {
+    "ibkr_multi_account_positions": {
+      "output_ref": "data/records/synthetic-ibkr-positions/raw.xml",
+      "request": {
+        "request_id": "synthetic-ibkr-multi-account",
+        "source": "ibkr_flex",
+        "operation": "positions",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:00:00Z",
+        "parameters": {"raw_fixture": "fixtures/brokers/ibkr-flex-multi-account.xml"},
+        "required_fields": ["account_ref", "symbol", "quantity", "currency", "reported_at"]
+      },
+      "result": {
+        "source_result": {
+          "source": "ibkr_flex",
+          "operation": "positions",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:00:00Z",
+          "available_at": null,
+          "coverage": "2/2 configured accounts; Activity Flex through previous business day; T+1",
+          "payload_ref": "data/records/synthetic-ibkr-positions/raw.xml",
+          "quality": "complete",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "Flex toDate is date-only and does not define an observation instant", "available_at": "Flex whenGenerated has no timezone"}
+        },
+        "raw_payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FlexQueryResponse queryName=\"synthetic-readonly\" type=\"AF\">\n  <FlexStatements count=\"2\">\n    <FlexStatement accountId=\"SYNTH-IBKR-A\" fromDate=\"20260917\" toDate=\"20260918\" whenGenerated=\"20260919;020000\">\n      <AccountInformation accountId=\"SYNTH-IBKR-A\" currency=\"USD\" />\n      <CashReportCurrency accountId=\"SYNTH-IBKR-A\" currency=\"USD\" endingCash=\"1250.25\" netLiquidation=\"9250.25\" />\n      <OpenPosition accountId=\"SYNTH-IBKR-A\" symbol=\"ACME\" assetCategory=\"STK\" currency=\"USD\" position=\"10\" costBasisPrice=\"80\" markPrice=\"90\" positionValue=\"900\" />\n      <Trade accountId=\"SYNTH-IBKR-A\" tradeID=\"SYNTH-TRADE-A\" symbol=\"ACME\" buySell=\"BUY\" quantity=\"10\" tradePrice=\"80\" dateTime=\"20260918;140000\" currency=\"USD\" />\n    </FlexStatement>\n    <FlexStatement accountId=\"SYNTH-IBKR-B\" fromDate=\"20260917\" toDate=\"20260918\" whenGenerated=\"20260919;020000\">\n      <AccountInformation accountId=\"SYNTH-IBKR-B\" currency=\"EUR\" />\n      <CashReportCurrency accountId=\"SYNTH-IBKR-B\" currency=\"EUR\" endingCash=\"500.50\" netLiquidation=\"2500.50\" />\n      <OpenPosition accountId=\"SYNTH-IBKR-B\" symbol=\"EUCO\" assetCategory=\"STK\" currency=\"EUR\" position=\"5\" costBasisPrice=\"390\" markPrice=\"400\" positionValue=\"2000\" />\n    </FlexStatement>\n  </FlexStatements>\n</FlexQueryResponse>\n",
+        "normalized": {
+          "raw_locator": "/cases/ibkr_multi_account_positions/result/raw_payload",
+          "raw_source_fixture": "fixtures/brokers/ibkr-flex-multi-account.xml",
+          "raw_format": "xml",
+          "sections": ["AccountInformation", "CashReportCurrency", "OpenPosition", "Trade"],
+          "account_refs": ["SYNTH-IBKR-A", "SYNTH-IBKR-B"],
+          "when_generated": "20260919;020000",
+          "when_generated_timezone": null,
+          "report_to_date": "20260918",
+          "date_coverage_only": true,
+          "query_kind": "activity_flex",
+          "freshness": "T+1",
+          "t_plus_one": true,
+          "complete_accounts": 2,
+          "configured_accounts": 2
+        },
+        "evidence": [],
+        "portfolio_snapshot": {
+          "snapshot_id": "synthetic-ibkr-snapshot-1",
+          "broker": "ibkr_flex",
+          "reported_at": null,
+          "retrieved_at": "2026-09-21T03:00:00Z",
+          "accounts": [
+            {"account_ref": "SYNTH-IBKR-A", "base_currency": "USD", "balances": [{"value": "1250.25", "unit": "money", "currency": "USD"}]},
+            {"account_ref": "SYNTH-IBKR-B", "base_currency": "EUR", "balances": [{"value": "500.50", "unit": "money", "currency": "EUR"}]}
+          ],
+          "positions": [
+            {"account_ref": "SYNTH-IBKR-A", "security": {"market": "US", "exchange": "XNAS", "symbol": "ACME", "currency": "USD"}, "quantity": {"value": "10", "unit": "shares"}, "market_value": {"value": "900", "unit": "money", "currency": "USD"}, "cost_basis": {"value": "800", "unit": "money", "currency": "USD"}},
+            {"account_ref": "SYNTH-IBKR-B", "security": {"market": "EU", "exchange": "XETR", "symbol": "EUCO", "currency": "EUR"}, "quantity": {"value": "5", "unit": "shares"}, "market_value": {"value": "2000", "unit": "money", "currency": "EUR"}, "cost_basis": {"value": "1950", "unit": "money", "currency": "EUR"}}
+          ],
+          "coverage": "2/2 configured accounts; all returned cash and open-position rows normalized",
+          "complete_read": true,
+          "confirmed_empty": false,
+          "unknown_reasons": {"reported_at": "Flex toDate is date-only and whenGenerated has no timezone"}
+        },
+        "gaps": []
+      }
+    },
+    "longbridge_multi_currency_accounts": {
+      "output_ref": "data/records/synthetic-longbridge-accounts/raw.json",
+      "request": {
+        "request_id": "synthetic-longbridge-accounts",
+        "source": "longbridge_oauth",
+        "operation": "accounts",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:05:00Z",
+        "parameters": {"raw_fixture": "fixtures/brokers/longbridge-readonly.json", "auth_context": "injected_settings_existing_oauth"},
+        "required_fields": ["account_ref", "currency", "balances", "retrieved_at"]
+      },
+      "result": {
+        "source_result": {
+          "source": "longbridge_oauth",
+          "operation": "accounts",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:05:00Z",
+          "available_at": null,
+          "coverage": "authorized account; all returned account_balance currency rows",
+          "payload_ref": "data/records/synthetic-longbridge-accounts/raw.json",
+          "quality": "complete",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "Longbridge account_balance response did not expose a snapshot timestamp", "available_at": "provider response did not expose an availability timestamp"}
+        },
+        "raw_payload": {
+          "currency": "HKD",
+          "net_assets": "100000.00",
+          "total_cash": "40000.00",
+          "cash_infos": [
+            {"currency": "HKD", "available_cash": "25000.00", "frozen_cash": "1000.00", "settling_cash": "14000.00"},
+            {"currency": "USD", "available_cash": "500.00", "frozen_cash": "0.00", "settling_cash": "50.00"}
+          ]
+        },
+        "normalized": {
+          "raw_locator": "/cases/longbridge_multi_currency_accounts/result/raw_payload",
+          "raw_source_fixture": "fixtures/brokers/longbridge-readonly.json",
+          "auth": "oauth_existing_store",
+          "currency_rows": ["HKD", "USD"],
+          "authorization_started_by_read": false,
+          "accounts": [
+            {
+              "account_ref": "SYNTH-LB-A",
+              "base_currency": "HKD",
+              "balances": [
+                {"value": "25000.00", "unit": "money", "currency": "HKD"},
+                {"value": "500.00", "unit": "money", "currency": "USD"}
+              ]
+            }
+          ]
+        },
+        "evidence": [],
+        "portfolio_snapshot": null,
+        "gaps": []
+      }
+    },
+    "longbridge_partial_positions": {
+      "output_ref": "data/records/synthetic-longbridge-partial/raw.json",
+      "request": {
+        "request_id": "synthetic-longbridge-partial",
+        "source": "longbridge_oauth",
+        "operation": "positions",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:10:00Z",
+        "parameters": {"include_funds": true, "raw_fixture": "fixtures/brokers/longbridge-readonly.json"},
+        "required_fields": ["account_ref", "symbol", "quantity", "currency"]
+      },
+      "result": {
+        "source_result": {
+          "source": "longbridge_oauth",
+          "operation": "positions",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:10:00Z",
+          "available_at": null,
+          "coverage": "stock_positions succeeded; fund_positions failed",
+          "payload_ref": "data/records/synthetic-longbridge-partial/raw.json",
+          "quality": "limited",
+          "errors": ["fund_positions: external"],
+          "unknown_reasons": {"observed_at": "position response did not expose a snapshot timestamp", "available_at": "provider response did not expose an availability timestamp"}
+        },
+        "raw_payload": {
+          "stock_positions": [{"symbol": "700.HK", "currency": "HKD", "quantity": "100", "available_quantity": "80", "cost_price": "310.00"}],
+          "fund_positions": null
+        },
+        "normalized": {
+          "raw_locator": "/cases/longbridge_partial_positions/result/raw_payload",
+          "successful_subreads": ["stock_positions"],
+          "failed_subreads": ["fund_positions"]
+        },
+        "evidence": [],
+        "portfolio_snapshot": {
+          "snapshot_id": "synthetic-longbridge-partial-1",
+          "broker": "longbridge_oauth",
+          "reported_at": null,
+          "retrieved_at": "2026-09-21T03:10:00Z",
+          "accounts": [{"account_ref": "SYNTH-LB-A", "base_currency": null, "balances": []}],
+          "positions": [{"account_ref": "SYNTH-LB-A", "security": {"market": "HK", "exchange": "XHKG", "symbol": "700", "currency": "HKD"}, "quantity": {"value": "100", "unit": "shares"}, "cost_basis": {"value": "31000.00", "unit": "money", "currency": "HKD"}}],
+          "coverage": "stock positions only; fund positions unavailable",
+          "complete_read": false,
+          "confirmed_empty": false,
+          "unknown_reasons": {"reported_at": "position response did not expose a snapshot timestamp"}
+        },
+        "gaps": [
+          {"gap_id": "synthetic-gap-fund-positions", "request_id": "synthetic-longbridge-partial", "required_content": "fund positions", "attempts": [{"source": "longbridge_oauth", "operation": "fund_positions", "result": "external failure"}], "impact": "portfolio coverage is partial", "next_action": "retry the existing read-only channel"}
+        ]
+      }
+    },
+    "ibkr_confirmed_empty_positions": {
+      "output_ref": "data/records/synthetic-ibkr-empty/raw.xml",
+      "request": {
+        "request_id": "synthetic-ibkr-empty",
+        "source": "ibkr_flex",
+        "operation": "positions",
+        "subject": "authorized-empty-account",
+        "as_of": "2026-09-21T03:15:00Z",
+        "parameters": {"query_kind": "activity_flex"},
+        "required_fields": ["account_ref", "reported_at", "coverage"]
+      },
+      "result": {
+        "source_result": {
+          "source": "ibkr_flex",
+          "operation": "positions",
+          "security_or_topic": "authorized-empty-account",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:15:00Z",
+          "available_at": null,
+          "coverage": "1/1 configured accounts; complete OpenPositions section; zero rows; T+1",
+          "payload_ref": "data/records/synthetic-ibkr-empty/raw.xml",
+          "quality": "complete",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "Flex toDate is date-only and does not define an observation instant", "available_at": "Flex whenGenerated has no timezone"}
+        },
+        "raw_payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FlexQueryResponse queryName=\"synthetic-empty\" type=\"AF\">\n  <FlexStatements count=\"1\">\n    <FlexStatement accountId=\"SYNTH-IBKR-EMPTY\" fromDate=\"20260917\" toDate=\"20260918\" whenGenerated=\"20260919;020000\">\n      <AccountInformation accountId=\"SYNTH-IBKR-EMPTY\" currency=\"USD\" />\n      <OpenPositions />\n    </FlexStatement>\n  </FlexStatements>\n</FlexQueryResponse>\n",
+        "normalized": {"raw_locator": "/cases/ibkr_confirmed_empty_positions/result/raw_payload", "raw_source_fixture": "fixtures/brokers/ibkr-flex-empty.xml", "raw_format": "xml", "account_refs": ["SYNTH-IBKR-EMPTY"], "open_position_rows": 0, "when_generated": "20260919;020000", "when_generated_timezone": null, "report_to_date": "20260918", "date_coverage_only": true, "t_plus_one": true, "position_section_complete": true},
+        "evidence": [],
+        "portfolio_snapshot": {
+          "snapshot_id": "synthetic-ibkr-empty-1",
+          "broker": "ibkr_flex",
+          "reported_at": null,
+          "retrieved_at": "2026-09-21T03:15:00Z",
+          "accounts": [{"account_ref": "SYNTH-IBKR-EMPTY", "base_currency": "USD", "balances": []}],
+          "positions": [],
+          "coverage": "complete OpenPositions section for 1/1 configured accounts",
+          "complete_read": true,
+          "confirmed_empty": true,
+          "unknown_reasons": {"reported_at": "Flex toDate is date-only and whenGenerated has no timezone"}
+        },
+        "gaps": []
+      }
+    },
+    "longbridge_read_failure": {
+      "output_ref": "data/records/synthetic-longbridge-failure/raw.json",
+      "request": {
+        "request_id": "synthetic-longbridge-failure",
+        "source": "longbridge_oauth",
+        "operation": "positions",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:20:00Z",
+        "parameters": {"auth_context": "injected_settings_existing_oauth"},
+        "required_fields": ["account_ref", "symbol", "quantity"]
+      },
+      "result": {
+        "source_result": {
+          "source": "longbridge_oauth",
+          "operation": "positions",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:20:00Z",
+          "available_at": null,
+          "coverage": "read failed before account coverage could be established",
+          "payload_ref": null,
+          "quality": "failed",
+          "errors": ["unauthorized: existing OAuth login unavailable"],
+          "unknown_reasons": {"observed_at": "read failed", "available_at": "read failed"}
+        },
+        "raw_payload": null,
+        "normalized": {"raw_locator": null, "complete_read": false, "confirmed_empty": false},
+        "evidence": [],
+        "portfolio_snapshot": null,
+        "gaps": [
+          {"gap_id": "synthetic-gap-broker-read", "request_id": "synthetic-longbridge-failure", "required_content": "authorized positions", "attempts": [{"source": "longbridge_oauth", "operation": "positions", "result": "unauthorized"}], "impact": "portfolio state is unknown; must not infer empty", "next_action": "restore the existing private OAuth login and rerun"}
+        ]
+      }
+    },
+    "unknown_identity_time_currency": {
+      "output_ref": "data/records/synthetic-ibkr-unknowns/raw.xml",
+      "request": {
+        "request_id": "synthetic-ibkr-unknowns",
+        "source": "ibkr_flex",
+        "operation": "accounts",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:25:00Z",
+        "parameters": {"query_kind": "activity_flex"},
+        "required_fields": ["account_ref", "reported_at", "currency"]
+      },
+      "result": {
+        "source_result": {
+          "source": "ibkr_flex",
+          "operation": "accounts",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": null,
+          "retrieved_at": "2026-09-21T03:25:00Z",
+          "available_at": null,
+          "coverage": "raw account row returned without required identity/time/currency",
+          "payload_ref": "data/records/synthetic-ibkr-unknowns/raw.xml",
+          "quality": "limited",
+          "errors": ["required fields missing: account_ref, reported_at, currency"],
+          "unknown_reasons": {"observed_at": "statement timestamp absent", "available_at": "statement generation time absent"}
+        },
+        "raw_payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FlexQueryResponse queryName=\"synthetic-missing-fields\" type=\"AF\">\n  <FlexStatements count=\"1\">\n    <FlexStatement>\n      <AccountInformation />\n      <CashReportCurrency endingCash=\"12.50\" />\n    </FlexStatement>\n  </FlexStatements>\n</FlexQueryResponse>\n",
+        "normalized": {
+          "raw_locator": "/cases/unknown_identity_time_currency/result/raw_payload",
+          "raw_source_fixture": "fixtures/brokers/ibkr-flex-missing-fields.xml",
+          "raw_format": "xml",
+          "raw_values": {"accountId": null, "currency": null, "whenGenerated": null, "endingCash": "12.50"},
+          "account_ref": null,
+          "reported_at": null,
+          "currency": null,
+          "unknown_reasons": {"account_ref": "provider field absent", "reported_at": "provider field absent", "currency": "provider field absent"}
+        },
+        "evidence": [],
+        "portfolio_snapshot": null,
+        "gaps": [
+          {"gap_id": "synthetic-gap-required-broker-fields", "request_id": "synthetic-ibkr-unknowns", "required_content": "account identity, report time, and currency", "attempts": [{"source": "ibkr_flex", "operation": "accounts", "result": "required fields absent"}], "impact": "cannot create a valid PortfolioSnapshot", "next_action": "retain raw row and fix/query required Flex fields"}
+        ]
+      }
+    },
+    "longbridge_today_history_executions": {
+      "output_ref": "data/records/synthetic-longbridge-executions/raw.json",
+      "request": {
+        "request_id": "synthetic-longbridge-executions",
+        "source": "longbridge_oauth",
+        "operation": "executions",
+        "subject": "authorized-portfolio",
+        "as_of": "2026-09-21T03:30:00Z",
+        "parameters": {"start_at": "2026-09-18T00:00:00Z", "end_at": "2026-09-21T03:30:00Z", "include_today": true, "raw_fixture": "fixtures/brokers/longbridge-readonly.json"},
+        "required_fields": ["trade_id", "order_id", "symbol", "side", "quantity", "price", "trade_done_at"]
+      },
+      "result": {
+        "source_result": {
+          "source": "longbridge_oauth",
+          "operation": "executions",
+          "security_or_topic": "authorized-portfolio",
+          "observed_at": "2026-09-21T02:10:00Z",
+          "retrieved_at": "2026-09-21T03:30:00Z",
+          "available_at": null,
+          "coverage": "today_executions plus history_executions for requested range; all pages reported complete",
+          "payload_ref": "data/records/synthetic-longbridge-executions/raw.json",
+          "quality": "complete",
+          "errors": [],
+          "unknown_reasons": {"available_at": "provider response did not expose an availability timestamp"}
+        },
+        "raw_payload": {
+          "today": [{"trade_id": "SYNTH-LB-TODAY-1", "order_id": "SYNTH-ORDER-1", "symbol": "700.HK", "side": "Buy", "quantity": "20", "price": "320.00", "trade_done_at": "2026-09-21T02:10:00Z"}],
+          "history": [{"trade_id": "SYNTH-LB-HISTORY-1", "order_id": "SYNTH-ORDER-0", "symbol": "700.HK", "side": "Buy", "quantity": "80", "price": "307.50", "trade_done_at": "2026-09-18T07:00:00Z"}]
+        },
+        "normalized": {
+          "raw_locator": "/cases/longbridge_today_history_executions/result/raw_payload",
+          "history_excludes_today": true,
+          "history_pages_complete": true,
+          "dedupe_key": "trade_id",
+          "executions": [
+            {"trade_id": "SYNTH-LB-HISTORY-1", "order_id": "SYNTH-ORDER-0", "symbol": "700.HK", "side": "Buy", "quantity": "80", "price": "307.50", "trade_done_at": "2026-09-18T07:00:00Z"},
+            {"trade_id": "SYNTH-LB-TODAY-1", "order_id": "SYNTH-ORDER-1", "symbol": "700.HK", "side": "Buy", "quantity": "20", "price": "320.00", "trade_done_at": "2026-09-21T02:10:00Z"}
+          ]
+        },
+        "evidence": [],
+        "portfolio_snapshot": null,
+        "gaps": []
+      }
+    }
+  }
+}

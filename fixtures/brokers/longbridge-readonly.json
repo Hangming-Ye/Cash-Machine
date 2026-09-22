@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "account_balance": [
+    {
+      "currency": "HKD",
+      "net_assets": "100000.00",
+      "total_cash": "40000.00",
+      "cash_infos": [
+        {"currency": "HKD", "available_cash": "25000.00", "frozen_cash": "1000.00", "settling_cash": "14000.00"},
+        {"currency": "USD", "available_cash": "500.00", "frozen_cash": "0.00", "settling_cash": "50.00"}
+      ]
+    }
+  ],
+  "stock_positions": [
+    {"symbol": "700.HK", "currency": "HKD", "quantity": "100", "available_quantity": "80", "cost_price": "310.00"}
+  ],
+  "today_executions": [
+    {"trade_id": "SYNTH-LB-TODAY-1", "order_id": "SYNTH-ORDER-1", "symbol": "700.HK", "side": "Buy", "quantity": "20", "price": "320.00", "trade_done_at": "2026-09-21T02:10:00Z"}
+  ],
+  "history_executions": [
+    {"trade_id": "SYNTH-LB-HISTORY-1", "order_id": "SYNTH-ORDER-0", "symbol": "700.HK", "side": "Buy", "quantity": "80", "price": "307.50", "trade_done_at": "2026-09-18T07:00:00Z"}
+  ]
+}
