@@ -1,0 +1,72 @@
+{
+  "request_id": "fixture-valuation-fcff",
+  "scope": "full",
+  "method": "dcf_fcff",
+  "valuation_date": "2026-01-15",
+  "currency": "USD",
+  "financial_refs": ["fixtures/valuation/financial-inputs.json"],
+  "evidence_refs": ["{{evidence_id}}"],
+  "evidence_use": "workflow evidence is retained as synthetic context and is not the source of the numeric assumptions",
+  "assumptions": [
+    {
+      "name": "forecast_fcff",
+      "reason": "synthetic two-period cash-flow path",
+      "source_refs": ["fixtures/valuation/financial-inputs.json"]
+    },
+    {
+      "name": "discount_and_terminal",
+      "reason": "synthetic scenario assumptions for arithmetic validation",
+      "source_refs": ["fixtures/valuation/expected.json"]
+    }
+  ],
+  "scenarios": {
+    "bear": {
+      "fcff": [
+        {"period": 1, "amount": {"value": "80", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}},
+        {"period": 2, "amount": {"value": "85", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}
+      ],
+      "wacc": "0.11",
+      "terminal_growth": "0.02"
+    },
+    "base": {
+      "fcff": [
+        {"period": 1, "amount": {"value": "100", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}},
+        {"period": 2, "amount": {"value": "110", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}
+      ],
+      "wacc": "0.10",
+      "terminal_growth": "0.03"
+    },
+    "bull": {
+      "fcff": [
+        {"period": 1, "amount": {"value": "115", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}},
+        {"period": 2, "amount": {"value": "130", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}
+      ],
+      "wacc": "0.09",
+      "terminal_growth": "0.035"
+    }
+  },
+  "share_basis": {
+    "diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"},
+    "as_of": "2026-01-15",
+    "source_ref": "fixtures/valuation/financial-inputs.json",
+    "basis": "diluted"
+  },
+  "method_inputs": {
+    "cash_flow_type": "FCFF",
+    "forecast_timing": "year_end",
+    "bridge": {
+      "debt": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "debt subtraction"},
+      "cash": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "cash addition"},
+      "minority_interest": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "minority subtraction"},
+      "other_adjustments": []
+    },
+    "bridge_convention": "debt_and_minority_subtracted_cash_added_other_adjustments_signed"
+  },
+  "quote_ref": null,
+  "sensitivity": {
+    "scenario": "base",
+    "wacc_rates": ["0.09", "0.10", "0.11"],
+    "terminal_growth_rates": ["0.025", "0.03", "0.035"]
+  },
+  "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}
+}

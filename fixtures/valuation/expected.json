@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "engine_status": "implemented_by_T030",
+  "api_contract": {
+    "future_signature": "calculate_valuation(request: Mapping[str, object]) -> Mapping[str, object]",
+    "methods": ["dcf_fcff", "dcf_fcfe", "equity_multiples", "enterprise_multiples", "ev_equity_bridge", "sum_of_parts", "asset_value"],
+    "required_common_fields": ["request_id", "method", "scope", "valuation_date", "currency", "financial_refs", "assumptions", "scenarios", "share_basis", "quote_ref", "sensitivity", "precision"],
+    "quantity_fields": ["value", "unit", "currency", "identity"],
+    "amount_unit_policy": {
+      "USD": {"currency": "USD", "base_scale": "1"},
+      "USD_million": {"currency": "USD", "base_scale": "1000000"},
+      "EUR_million": {"currency": "EUR", "base_scale": "1000000"},
+      "million_shares": {"currency": null, "base_scale": "1000000"},
+      "USD_per_share": {"currency": "USD", "base_scale": "1"},
+      "USD_per_EUR": {"currency": "USD", "base_scale": "1"}
+    },
+    "currency_policy": {
+      "accepted_codes": "runtime ISO 4217 codes",
+      "fixture_codes": ["USD", "EUR"],
+      "fixture_codes_are_examples_not_engine_whitelist": true,
+      "amount_unit_templates": ["{currency}", "{currency}_million"]
+    },
+    "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001", "rounding": "none_before_comparison"},
+    "net_debt_mapping": "method_inputs.bridge carries debt and cash separately; a redundant net_debt field is rejected",
+    "result_boundary": "calculation_only_never_buy_sell_watch"
+  },
+  "cases": {
+    "dcf_fcff": {
+      "fixture_scope": "full_scenario_valuation",
+      "request": {
+        "request_id": "valuation-dcf-fcff",
+        "scope": "full",
+        "method": "dcf_fcff",
+        "valuation_date": "2026-01-15",
+        "currency": "USD",
+        "financial_refs": ["fixtures/valuation/financial-inputs.json"],
+        "assumptions": [
+          {"name": "forecast_fcff", "reason": "synthetic two-period cash-flow path", "source_refs": ["fixtures/valuation/financial-inputs.json"]},
+          {"name": "discount_and_terminal", "reason": "synthetic scenario assumptions for arithmetic validation", "source_refs": ["fixtures/valuation/expected.json"]}
+        ],
+        "scenarios": {
+          "bear": {"fcff": [{"period": 1, "amount": {"value": "80", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}}, {"period": 2, "amount": {"value": "85", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}], "wacc": "0.11", "terminal_growth": "0.02"},
+          "base": {"fcff": [{"period": 1, "amount": {"value": "100", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}}, {"period": 2, "amount": {"value": "110", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}], "wacc": "0.10", "terminal_growth": "0.03"},
+          "bull": {"fcff": [{"period": 1, "amount": {"value": "115", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 1"}}, {"period": 2, "amount": {"value": "130", "unit": "USD_million", "currency": "USD", "identity": "FCFF year 2"}}], "wacc": "0.09", "terminal_growth": "0.035"}
+        },
+        "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"},
+        "method_inputs": {"cash_flow_type": "FCFF", "forecast_timing": "year_end", "bridge": {"debt": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "debt subtraction"}, "cash": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "cash addition"}, "minority_interest": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "minority subtraction"}, "other_adjustments": []}, "bridge_convention": "debt_and_minority_subtracted_cash_added_other_adjustments_signed"},
+        "quote_ref": null,
+        "sensitivity": {"scenario": "base", "wacc_rates": ["0.09", "0.10", "0.11"], "terminal_growth_rates": ["0.025", "0.03", "0.035"]},
+        "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}
+      },
+      "expected": {
+        "scenario_results": {
+          "bear": {"enterprise_value": "922.9229229229229229229229229", "equity_value": "752.9229229229229229229229229", "per_share_value": "7.529229229229229229229229229"},
+          "base": {"enterprise_value": "1519.480519480519480519480520", "equity_value": "1349.480519480519480519480520", "per_share_value": "13.4948051948051948051948052"},
+          "bull": {"enterprise_value": "2273.978315262718932443703086", "equity_value": "2103.978315262718932443703086", "per_share_value": "21.03978315262718932443703086"}
+        },
+        "sensitivity_per_share": {
+          "0.09": {"0.025": "14.74318983768525052928722654", "0.03": "16.03700305810397553516819572", "0.035": "17.56605504587155963302752294"},
+          "0.10": {"0.025": "12.54242424242424242424242424", "0.03": "13.4948051948051948051948052", "0.035": "14.5937062937062937062937063"},
+          "0.11": {"0.025": "10.85961844197138314785373609", "0.03": "11.58828828828828828828828829", "0.035": "12.41411411411411411411411412"}
+        },
+        "currency": "USD",
+        "units": {"enterprise_value": "USD_million", "equity_value": "USD_million", "per_share_value": "USD_per_share"},
+        "warnings": []
+      }
+    },
+    "dcf_fcfe": {
+      "fixture_scope": "base_method_boundary",
+      "request": {
+        "request_id": "valuation-dcf-fcfe", "method": "dcf_fcfe", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD",
+        "financial_refs": ["fixtures/valuation/financial-inputs.json"],
+        "assumptions": [{"name": "fcfe_path", "reason": "synthetic FCFE path", "source_refs": ["fixtures/valuation/financial-inputs.json"]}],
+        "scenarios": {"base": {"fcfe": [{"period": 1, "amount": {"value": "80", "unit": "USD_million", "currency": "USD", "identity": "FCFE year 1"}}, {"period": 2, "amount": {"value": "88", "unit": "USD_million", "currency": "USD", "identity": "FCFE year 2"}}], "cost_of_equity": "0.12", "terminal_growth": "0.03"}},
+        "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"},
+        "method_inputs": {"cash_flow_type": "FCFE", "forecast_timing": "year_end", "bridge": null}, "quote_ref": null, "sensitivity": null,
+        "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}
+      },
+      "expected": {"equity_value": "944.4444444444444444444444444", "per_share_value": "9.444444444444444444444444444", "bridge_applied": false, "debt_subtracted_after_fcfe": false, "currency": "USD", "units": {"equity_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "equity_multiples": {
+      "fixture_scope": "base_method_hand_calculation",
+      "request": {"request_id": "valuation-equity-multiple", "method": "equity_multiples", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json", "fixtures/valuation/peer-set.json"], "assumptions": [{"name": "peer_multiple", "reason": "synthetic peer median with documented business comparability", "source_refs": ["fixtures/valuation/peer-set.json"]}], "scenarios": {"base": {"denominator_name": "net_income", "denominator": {"value": "120", "unit": "USD_million", "currency": "USD", "identity": "net income"}, "multiple": "15", "multiple_basis": "price_to_earnings"}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"valuation_level": "equity", "peer_set_ref": "fixtures/valuation/peer-set.json", "peer_justification": "same synthetic business model and currency"}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"equity_value": "1800", "per_share_value": "18", "currency": "USD", "units": {"equity_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "enterprise_multiples": {
+      "fixture_scope": "base_method_hand_calculation",
+      "request": {"request_id": "valuation-enterprise-multiple", "method": "enterprise_multiples", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json", "fixtures/valuation/peer-set.json"], "assumptions": [{"name": "peer_multiple", "reason": "synthetic EV/EBITDA median", "source_refs": ["fixtures/valuation/peer-set.json"]}], "scenarios": {"base": {"denominator_name": "ebitda", "denominator": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "EBITDA"}, "multiple": "8", "multiple_basis": "enterprise_value_to_ebitda"}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"valuation_level": "enterprise", "peer_set_ref": "fixtures/valuation/peer-set.json", "peer_justification": "same synthetic business model and currency", "bridge": {"debt": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "debt subtraction"}, "cash": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "cash addition"}, "minority_interest": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "minority subtraction"}, "other_adjustments": []}, "bridge_convention": "debt_and_minority_subtracted_cash_added_other_adjustments_signed"}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"enterprise_value": "1600", "equity_value": "1430", "per_share_value": "14.3", "currency": "USD", "units": {"enterprise_value": "USD_million", "equity_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "ev_equity_bridge": {
+      "fixture_scope": "bridge_component_hand_calculation",
+      "request": {"request_id": "valuation-bridge", "method": "ev_equity_bridge", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json"], "assumptions": [{"name": "bridge_items", "reason": "synthetic named-balance bridge", "source_refs": ["fixtures/valuation/financial-inputs.json"]}], "scenarios": {"base": {"enterprise_value": {"value": "1500", "unit": "USD_million", "currency": "USD", "identity": "enterprise value"}}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"bridge": {"debt": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "debt"}, "cash": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "cash"}, "minority_interest": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "minority interest"}, "other_adjustments": [{"name": "pension_deficit", "amount": {"value": "-10", "unit": "USD_million", "currency": "USD", "identity": "pension deficit signed subtraction"}}]}, "bridge_convention": "debt_and_minority_subtracted_cash_added_other_adjustments_signed"}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"equity_value": "1320", "per_share_value": "13.2", "currency": "USD", "units": {"equity_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "sum_of_parts": {
+      "fixture_scope": "base_method_hand_calculation",
+      "request": {"request_id": "valuation-sotp", "method": "sum_of_parts", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json", "fixtures/valuation/fx-rate.json"], "assumptions": [{"name": "segment_methods", "reason": "synthetic heterogeneous segment methods", "source_refs": ["fixtures/valuation/expected.json"]}, {"name": "fx", "reason": "dated synthetic conversion", "source_refs": ["fixtures/valuation/fx-rate.json"]}], "scenarios": {"base": {"segments": [{"segment_id": "A", "valuation_level": "enterprise", "method": "ev_to_ebitda", "denominator": {"value": "100", "unit": "USD_million", "currency": "USD", "identity": "segment A EBITDA"}, "multiple": "8"}, {"segment_id": "B", "valuation_level": "equity", "method": "price_to_earnings", "denominator": {"value": "50", "unit": "EUR_million", "currency": "EUR", "identity": "segment B earnings"}, "multiple": "12", "fx_ref": "fixtures/valuation/fx-rate.json"}]}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"common_bridge": {"debt": {"value": "100", "unit": "USD_million", "currency": "USD", "identity": "common debt"}, "cash": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "common cash"}, "minority_interest": {"value": "0", "unit": "USD_million", "currency": "USD", "identity": "no common minority interest"}, "other_adjustments": []}, "bridge_convention": "debt_and_minority_subtracted_cash_added_other_adjustments_signed", "bridge_applies_to": ["A"], "fx": {"EURUSD": {"rate": "1.10", "unit": "USD_per_EUR", "as_of": "2026-01-15", "source_ref": "fixtures/valuation/fx-rate.json"}}}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"segment_values_reporting_currency": {"A_equity_USD": "720", "B_equity_USD": "660"}, "equity_value": "1380", "per_share_value": "13.8", "currency": "USD", "units": {"equity_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "asset_value": {
+      "fixture_scope": "base_method_hand_calculation",
+      "request": {"request_id": "valuation-assets", "method": "asset_value", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json"], "assumptions": [{"name": "asset_marks", "reason": "synthetic stated asset marks", "source_refs": ["fixtures/valuation/expected.json"]}], "scenarios": {"base": {"assets": [{"name": "cash", "amount": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "cash asset"}}, {"name": "property", "amount": {"value": "500", "unit": "USD_million", "currency": "USD", "identity": "property asset"}}, {"name": "investments", "amount": {"value": "100", "unit": "USD_million", "currency": "USD", "identity": "investment asset"}}], "liabilities": [{"name": "debt", "amount": {"value": "250", "unit": "USD_million", "currency": "USD", "identity": "debt liability"}}, {"name": "other", "amount": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "other liability"}}]}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"missing_value_policy": "reject_never_fill_zero"}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"net_asset_value": "500", "per_share_value": "5", "currency": "USD", "units": {"net_asset_value": "USD_million", "per_share_value": "USD_per_share"}}
+    },
+    "negative_denominator": {
+      "fixture_scope": "inapplicable_method_boundary",
+      "request": {"request_id": "valuation-negative-denominator", "method": "enterprise_multiples", "scope": "component", "valuation_date": "2026-01-15", "currency": "USD", "financial_refs": ["fixtures/valuation/financial-inputs.json", "fixtures/valuation/peer-set.json"], "assumptions": [{"name": "negative_ebitda", "reason": "synthetic inappropriate denominator boundary", "source_refs": ["fixtures/valuation/expected.json"]}], "scenarios": {"base": {"denominator_name": "ebitda", "denominator": {"value": "-10", "unit": "USD_million", "currency": "USD", "identity": "negative EBITDA"}, "multiple": "8", "multiple_basis": "enterprise_value_to_ebitda"}}, "share_basis": {"diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}, "as_of": "2026-01-15", "source_ref": "fixtures/valuation/financial-inputs.json", "basis": "diluted"}, "method_inputs": {"valuation_level": "enterprise", "peer_set_ref": "fixtures/valuation/peer-set.json"}, "quote_ref": null, "sensitivity": null, "precision": {"absolute_tolerance": "0.000000000001", "relative_tolerance": "0.000000000001"}},
+      "expected": {"applicable": false, "value": null, "reason": "negative denominator makes EV/EBITDA not meaningful", "currency": "USD", "warnings": ["inappropriate_negative_denominator"]}
+    }
+  },
+  "scale_normalization_case": {
+    "description": "base-currency equity value divided by million-share basis",
+    "equity_value": {"value": "1330000000", "unit": "USD", "currency": "USD", "identity": "equity value in base currency units"},
+    "diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "diluted shares in millions"},
+    "expected_per_share": {"value": "13.3", "unit": "USD_per_share", "currency": "USD", "identity": "value per diluted share"}
+  },
+  "invalid_cases": {
+    "terminal_growth_not_below_discount": {"method": "dcf_fcff", "wacc": "0.03", "terminal_growth": "0.03", "expected_error": "terminal_growth_must_be_below_discount_rate"},
+    "redundant_net_debt_and_cash": {"bridge": {"net_debt": "150", "debt": "200", "cash": "50"}, "expected_error": "redundant_bridge_inputs"},
+    "missing_fx": {"from_currency": "EUR", "to_currency": "USD", "fx": null, "expected_error": "explicit_dated_fx_required"},
+    "zero_diluted_shares": {"share_basis": {"value": "0", "unit": "million_shares", "as_of": "2026-01-15"}, "expected_error": "diluted_shares_must_be_positive"},
+    "share_date_mismatch": {"valuation_date": "2026-01-15", "share_as_of": "2025-12-31", "alignment_reason": null, "expected_error": "share_basis_date_requires_alignment"},
+    "missing_asset_value": {"value": null, "unit": "USD_million", "unknown_reason": "not supplied", "expected_error": "missing_values_not_zero"},
+    "boolean_amount": {"value": true, "unit": "USD_million", "expected_error": "finite_decimal_required"},
+    "nonfinite_amount": {"value": "NaN", "unit": "USD_million", "expected_error": "finite_decimal_required"},
+    "currency_unit_mismatch": {"value": "10", "unit": "EUR_million", "currency": "USD", "expected_error": "unit_currency_mismatch"},
+    "zero_multiple_denominator": {"value": "0", "method": "enterprise_multiples", "expected_error": "nonpositive_denominator_inapplicable"},
+    "missing_scenario_scope": {"full_valuation": true, "scenarios": {"base": {}}, "required": ["bear", "base", "bull"], "expected_error": "scenario_scope_incomplete_for_full_valuation"}
+  }
+}
+

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "valuation_date": "2026-01-15",
+  "peer_justification": "Synthetic peers share the fixture company's stated business model and currency for arithmetic validation only.",
+  "peers": [
+    {"peer_id": "SYN-P1", "pe": "14", "ev_to_ebitda": "7"},
+    {"peer_id": "SYN-P2", "pe": "15", "ev_to_ebitda": "8"},
+    {"peer_id": "SYN-P3", "pe": "16", "ev_to_ebitda": "9"}
+  ],
+  "units": {"pe": "multiple_of_net_income", "ev_to_ebitda": "multiple_of_ebitda"},
+  "source_provenance": {"source_ref": "fixtures/valuation/peer-set.json", "available_at": "2026-01-15T08:00:00Z"}
+}

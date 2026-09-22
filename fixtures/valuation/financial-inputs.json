@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "evidence_level": "hand_calculation_fixture_only",
+  "security": {"market": "US", "exchange": "XNAS", "symbol": "SYNV", "currency": "USD"},
+  "valuation_date": "2026-01-15",
+  "values": {
+    "debt": {"value": "200", "unit": "USD_million", "currency": "USD", "identity": "total_debt"},
+    "cash": {"value": "50", "unit": "USD_million", "currency": "USD", "identity": "cash_and_equivalents"},
+    "minority_interest": {"value": "20", "unit": "USD_million", "currency": "USD", "identity": "minority_interest"},
+    "diluted_shares": {"value": "100", "unit": "million_shares", "currency": null, "identity": "same-date diluted shares"}
+  },
+  "method_inputs": {
+    "fcff": {
+      "bear": ["80", "85"],
+      "base": ["100", "110"],
+      "bull": ["115", "130"],
+      "unit": "USD_million",
+      "timing": "year_end"
+    },
+    "fcfe": {"base": ["80", "88"], "unit": "USD_million", "timing": "year_end"},
+    "multiples": {"net_income": "120", "ebitda": "200", "unit": "USD_million"},
+    "segments": {
+      "A_ebitda": {"value": "100", "unit": "USD_million", "currency": "USD"},
+      "B_net_income": {"value": "50", "unit": "EUR_million", "currency": "EUR"}
+    },
+    "asset_value": {
+      "assets": {"cash": "200", "property": "500", "investments": "100"},
+      "liabilities": {"debt": "250", "other": "50"},
+      "unit": "USD_million"
+    }
+  },
+  "source_provenance": {
+    "source_ref": "fixtures/valuation/financial-inputs.json",
+    "available_at": "2026-01-15T08:00:00Z",
+    "limitations": ["synthetic values; not company evidence"]
+  }
+}
