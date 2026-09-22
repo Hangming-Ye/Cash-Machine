@@ -1,0 +1,11 @@
+{
+  "root": "/workspace/cash-machine",
+  "enabled_sources": [
+    "finnhub",
+    "tiingo",
+    "fmp_stable",
+    "akshare",
+    "ibkr_flex",
+    "longbridge_oauth"
+  ]
+}

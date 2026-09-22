@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "kind": "synthetic_decision_support",
+  "evidence_ref": "{{evidence_id}}",
+  "calculation_ref": "{{calculation_id}}",
+  "note": "fixture metadata only; not real evidence"
+}

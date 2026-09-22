@@ -1,0 +1,39 @@
+[project]
+name = "cash-research"
+version = "0.1.0"
+description = "Deterministic research utilities for the Cash Machine Grok Bot workflow"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28,<0.29",
+    "numpy>=2.2,<3",
+    "pandas>=2.2,<3",
+    "pydantic>=2.10,<3",
+    "scipy>=1.14,<2",
+]
+
+[project.optional-dependencies]
+akshare = [
+    "akshare==1.18.97",
+]
+longbridge = [
+    "longbridge==4.5.0",
+]
+
+[project.scripts]
+cash-research = "cash_research.cli:console_main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9",
+]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cash_research"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]

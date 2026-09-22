@@ -1,0 +1,8 @@
+{
+  "request_id": "fixture-report-check",
+  "draft_ref": "fixtures/reports/decision-draft.json",
+  "record_type": "Decision",
+  "reference_refs": [],
+  "report_ref": "fixtures/reports/decision-report.md",
+  "attachment_refs": ["fixtures/reports/decision-support.json"]
+}

@@ -1,0 +1,16 @@
+{
+  "decision_id": "fixture-draft",
+  "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNV", "currency": "USD"},
+  "as_of": "{{memory_packet_as_of}}",
+  "label": "watch",
+  "reason_refs": ["{{evidence_id}}", "{{calculation_id}}"],
+  "price_or_conditions": null,
+  "price_or_conditions_reason": "synthetic workflow calculation must be read before a price is supportable",
+  "evidence_limited": true,
+  "limitations": ["synthetic fixture only"],
+  "horizon": "12 months",
+  "risks": ["synthetic demand risk"],
+  "invalidators": ["synthetic evidence changes"],
+  "previous_id": null,
+  "memory_packet_refs": ["{{memory_packet_id}}"]
+}
