@@ -2,7 +2,7 @@
 
 **需求依据：[已对齐的Intent](docs/intent.md)。** 后续spec以此为准；下面的架构、岗位和任务包为设计候选，不得把其固定数量或执行上限当成用户已确认的需求。
 
-2026-09-20。当前v0.3先读 [Bot作业设计](BOT_OPERATING_SPEC.md) 和 [完整岗位/任务包](bot-kit/README.md)，业务背景见 [主体架构](FINANCIAL_RESEARCH_ARCHITECTURE_20260920.md)。专题中的建议保留各研究员原始判断；运行实现取舍以v0.3作业规格和bot-kit为准。
+2026-09-20。当前v0.3先读 [Bot作业设计](BOT_OPERATING_SPEC.md) 和 [完整岗位/任务包](bot-kit/README.md)，业务背景见 [主体架构](FINANCIAL_RESEARCH_ARCHITECTURE_20260920.md)。专题中的建议保留各研究员原始判断；当前范围以 Intent 和 spec001 为准；v0.3、bot-kit 与旧研究只作候选。记忆及原生接入的最新调研见研究 15。
 
 最新实施原则：旧sec-analysis只作为部分取数实现参考，复用优先级低，允许重写。旧专题中“围绕现有工程扩展/优先复用Client”的建议不再是架构约束。
 
@@ -36,6 +36,12 @@
 | [11 金融场景手册](research/11-financial-scenario-playbooks.md) | 12个场景的触发、金融分析步骤、程序/模型分工、输出和失败处理 |
 | [12 简化运行时](research/12-simple-runtime-design.md) | Description/Skill与API system层的区别、原生派发边界和轻量运行实现 |
 | [13 当前取数代码阅读](research/13-current-data-implementation.md) | 已导入代码的真实调用链、供应商/账户能力、时间与复权/PIT限制；只作实现参考，复用优先级低 |
+
+| [14 记忆提炼与再注入](research/14-memory-consolidation.md) | LangMem、Mem0、Letta、Graphiti 对比；撤销仅存账本后置记忆的建议；轻量闭环与效果验收 |
+
+| [15 Grok Bot 记忆接入](research/15-grok-memory-integration.md) | 真实产品可配置边界、市场用例、金融记忆研究、任务级读取与整理、组件接法及现场小样例 |
+
+> **当前plan的数据决定**：沿用现有六类接入，遗漏见 [数据基线与缺口](specs/001-investment-research-framework/data-sources.md)。以下供应商／组件选择表保留为早期调研，不代表引入新的计划依赖。
 
 ## 采用、试验、暂缓
 

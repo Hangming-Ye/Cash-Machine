@@ -1,50 +1,123 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: 1.0.0 -> 1.1.0 (MINOR: expanded governance and added Scope Boundaries)
+Modified principles:
+- I. 完整研究与人工决策 -> unchanged title; clarified completeness and runtime scope
+- II. 沿用真实产品能力，保持简单 -> unchanged title; clarified native entry and deterministic boundaries
+- III. 当前数据接入优先，缺口单列 -> unchanged title; clarified existing-source baseline and fallback
+- IV. 证据、复盘与有效记忆 -> unchanged title; clarified historical evidence and task-specific memory
+- V. 范围与验证诚实 -> unchanged title; clarified acceptance and blocked-result reporting
+Added sections: Scope Boundaries
+Expanded sections: Development Workflow; Governance
+Removed sections: none
+Dates: initial constraints recorded 2026-09-20; formal adoption requested 2026-09-21
+Dependent artifacts: reviewed intent, approved plan assumptions, and current spec001 context;
+  no template or feature artifact modified by this command. No required follow-up change identified.
+Deferred placeholders / TODOs: none
+-->
+# Cash Machine Constitution
+
+本文件规定项目的长期原则与治理边界，依据[已确认 Intent](../../docs/intent.md)、
+用户后续明确指令及[已批准方案记录](../../specs/001-investment-research-framework/plan-assumptions.md)。
+既有约束于 2026-09-20 首次整理；2026-09-21 按用户请求正式建立本版本。
+本文件不改变已批准方案，也不把研究候选或具体实现参数升级为长期原则。
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 完整研究与人工决策
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+- 必须覆盖供应链探索、单票因子研究、持仓／自选综合判断；分批交付不能代替完整目标。
+- 必须支持美股、港股、A股。市场、主题、标的、期限和关注范围由实际调用指定，
+  不得把首批样例、固定候选数或固定模板列表当成永久研究边界。
+- 用户给出目标与范围后，框架必须主动分解问题、补证并推进；重要目标取舍交用户决定。
+  常见合理问题不能仅因没有同名模板而退回用户。
+- 必须提供有依据的研究结论、价格或条件、风险及反证；不得提交、修改或撤销订单。
+  未找到机会或未发现因子增量可以是有效研究结果；缺少应有方法不能冒充正常完成。
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. 沿用真实产品能力，保持简单
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+- 必须依托已有 Grok Bot 的常驻、定时、协作和手机／PC 入口，不重复建设调度平台、
+  复杂任务协议或恢复状态机；调用失败说明原因并允许简单重跑。
+- 岗位和任务必须给出足够的目标、输入、分析方法、交付要求及异常处理，
+  不得依赖父会话隐含背景或模型自行猜测职责。
+- 计算、时点／单位处理及可重复校验必须由程序执行；模型承担材料理解和研究判断。
+  结构检查通过不能冒充语义正确或投资判断有效。
+- 集成设计必须依据产品公开能力或现场证据；不得假定能替换内部记忆、编辑原始
+  system prompt、拦截每次模型调用或控制未公开的 Bot 生命周期接口。
+- 手机与 PC 使用同一交付格式。技术选择必须能说明解决的具体问题，
+  不为未经证实的需求提前增加服务、数据库或第二套 Agent 运行环境。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. 当前数据接入优先，缺口单列
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+- 必须沿用用户当前已有的数据接入和已授权券商只读能力；不能把券商接入后置为可选功能。
+  凭证已提供不等于所有字段、历史覆盖和权限已实测。
+- 数据遗漏必须单列，注明影响、已尝试路径和下一动作。既有源不足时，必须主动尝试
+  适用的已接入来源、网页搜索、原始披露或可追溯材料导入，继续独立可完成的部分。
+- 不得编造数据、以零值掩盖缺失、以读取失败冒充空仓，或将零散搜索材料当成完整历史序列。
+  行情和基础新闻不能替代研报、社交等主观材料的研究作用。
+- 不得未经授权更换供应商、采购服务或扩大账户权限。具体来源清单及字段限制由
+  当前 feature 文档维护，不固化为不可变的供应商架构。
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. 证据、复盘与有效记忆
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+- 关键判断必须保留来源、可得时点、假设、计算依据、反证及限制；事实、来源观点、
+  我方推断必须区分。历史判断不得被后来的总结或更正无痕覆盖。
+- 复盘必须区分当时可知依据和后来事实；未到期或未触发的判断不得直接判成功或失败。
+  单次涨跌不能自动成为通用经验或证明因子有效。
+- 记忆必须完成提炼、去重压缩、相关检索、实际再注入、更新与失效处理。
+  仅保存记录、具备搜索接口或模型自称已读取，不构成有效记忆的验收证据。
+- 记忆必须结合任务特点：定时任务保留基线与增量，长期任务保留假设演变与未决问题，
+  重分析保留可回查的证据、计算口径和结论成立条件；同一任务可以兼具这些特点。
+- 历史还原不能读入截止点后才形成的经验；事后复盘可以用后来材料，但必须明确分区。
+  压缩不得将假设变为事实、删掉关键反证，或损坏原始依据的可追溯性。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. 范围与验证诚实
+
+- 必须分别报告文档检查、合成／模拟测试、真实数据访问及原生 Grok 行为的证据等级。
+  接口可调用、报告已生成或第三方论文有效，均不能替代本项目研究实用性验收。
+- 完成声明必须满足当前 spec 的验收标准。数据或访问缺口可以阻塞相关案例，
+  但不得用受限案例替代完整案例，也不得为宣布完成而静默降低标准。
+- 受阻与未执行事项必须能随时记录；不得等全部通过才允许汇总问题。
+  独立可完成的工作继续推进，不把局部缺口变成整个项目停滞。
+- 必须保持代码、文档、契约和任务清单一致；已知的相互矛盾指令不得同时作为活动配置使用。
+
+## Scope Boundaries
+
+- 当前为个人投资研究和人工决策支持；自动交易、通知系统与多用户商业平台不在本轮范围。
+- 旧 sec-analysis 仅作参考，复用优先级低；不得为兼容旧工程改变已确认目标。
+  `archive/` 快照必须保持原样，复用时在活动工程中验证，不直接把归档作为运行应用。
+- 凭证、非公开持仓与真实运行数据不得进入 Git、公开模板或公开报告；
+  不把共享 Bot 的名称或目录分工当作权限隔离。
+- 必须保留现有 Git 历史、`main` 名称和远程配置；未经用户要求不得推送。
+- 语言版本、库、文件结构、命令、岗位数量、样例数量、预算及阈值属于 feature 设计，
+  由 spec／plan／契约与批准记录约束，不在本宪章中永久锁定。
+
+## Development Workflow
+
+1. 按 intent → spec → plan → tasks → implementation 推进；按已确认目标审查后续产物。
+   新增假设、重要取舍及决策差异必须明确列出，遵循用户要求的审批范围。
+2. 既有批准持续有效，不重复询问已批准事项。批准文档不自动证明部署或效果通过；
+   实施和外部操作须在当前用户授权范围内进行。
+3. Plan 阶段检查原则一致性；tasks 阶段检查需求覆盖、依赖与验证归属；
+   实施前解决影响正确性、范围或权限的已知冲突，变更后执行相关的最小有效检查。
+4. 每个完成任务必须有对应产物和检查依据；现场验证缺失就保持该项未完成。
+   不为低风险文档改写机械增加产品测试，不以程序测试替代真实 Bot 研究行为检查。
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+本宪章在项目文档内约束 spec、plan、tasks 及实现；系统／工具约束和用户最新明确指令优先。
+研究报告、旧 handoff、市场模板及 bot-kit 候选内容均不能自行修改这些原则。
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+修订须说明问题、依据、影响及需同步的文档。涉及目标、范围、权限或重要架构取舍时，
+按用户要求取得批准后更新，不通过降低原则来掩盖实现缺陷。授权范围内的等价澄清与纠错
+可直接完成，但必须记录变化；不得增加无关审批层或要求用户重新确认已有决定。
+
+版本采用语义版本：原则删除或不兼容重定义升 MAJOR；新增原则、章节或实质扩展治理说明
+升 MINOR；不改变含义的措辞、链接和格式修正升 PATCH。每次修订保留正式采用日期，
+更新 Last Amended，并在文件顶部记录 Sync Impact Report。依赖文档由相应工作流核对和同步，
+不能因模板举例而引入新的产品要求。
+
+原则检查必须说明实际依据。发现冲突先修正受影响产物；确需改变原则则由显式修订处理，
+不能把“检查通过”当作自动豁免。当前已批准的方案与任务仅因本次正式建章不需要重新审批。
+
+**Version**: 1.1.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21
