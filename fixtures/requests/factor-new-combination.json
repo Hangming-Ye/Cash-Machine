@@ -1,0 +1,172 @@
+{
+  "request_id": "factor-new-combination",
+  "security": {
+    "market": "US",
+    "exchange": "XNAS",
+    "symbol": "SYNF",
+    "currency": "USD"
+  },
+  "hypothesis": "A volume anomaly conditions one-bar price momentum without defining a new primitive.",
+  "failure_regimes": [
+    "low-liquidity prints",
+    "corporate-action volume discontinuity",
+    "mean-reverting event days"
+  ],
+  "dataset_ref": "fixtures/factors/series-1d.json",
+  "expression": {
+    "op": "where",
+    "args": [
+      {
+        "op": "gt",
+        "args": [
+          {
+            "op": "safe_divide",
+            "args": [
+              {
+                "op": "field",
+                "args": [],
+                "params": {
+                  "name": "volume"
+                }
+              },
+              {
+                "op": "rolling_mean",
+                "args": [
+                  {
+                    "op": "field",
+                    "args": [],
+                    "params": {
+                      "name": "volume"
+                    }
+                  }
+                ],
+                "params": {
+                  "window": {
+                    "bind": "volume_window"
+                  },
+                  "min_periods": {
+                    "bind": "volume_window"
+                  }
+                }
+              }
+            ],
+            "params": {}
+          },
+          {
+            "op": "constant",
+            "args": [],
+            "params": {
+              "value": {
+                "bind": "volume_threshold"
+              },
+              "unit": "dimensionless"
+            }
+          }
+        ],
+        "params": {}
+      },
+      {
+        "op": "pct_return",
+        "args": [
+          {
+            "op": "field",
+            "args": [],
+            "params": {
+              "name": "close"
+            }
+          }
+        ],
+        "params": {
+          "periods": {
+            "bind": "return_periods"
+          }
+        }
+      },
+      {
+        "op": "constant",
+        "args": [],
+        "params": {
+          "value": 0.0,
+          "unit": "decimal_return"
+        }
+      }
+    ],
+    "params": {}
+  },
+  "parameter_schema": {
+    "volume_window": {
+      "type": "integer",
+      "unit": "bars",
+      "minimum": 1
+    },
+    "volume_threshold": {
+      "type": "number",
+      "unit": "dimensionless"
+    },
+    "return_periods": {
+      "type": "integer",
+      "unit": "bars",
+      "minimum": 1
+    }
+  },
+  "parameter_sets": [
+    {
+      "parameter_set_id": "p-window2",
+      "bindings": {
+        "volume_window": 2,
+        "volume_threshold": 1.4,
+        "return_periods": 1
+      }
+    },
+    {
+      "parameter_set_id": "p-window3",
+      "bindings": {
+        "volume_window": 3,
+        "volume_threshold": 1.6,
+        "return_periods": 1
+      }
+    }
+  ],
+  "target": "forward_return:close:1bar",
+  "target_spec": {
+    "canonical_id": "forward_return:close:1bar",
+    "operation": "forward_return",
+    "field": "close",
+    "horizon": 1,
+    "horizon_unit": "bar",
+    "unit": "decimal_return"
+  },
+  "horizon": "1bar",
+  "bar_interval": "1d",
+  "baseline": "unconditional_same_security_forward_return",
+  "baseline_spec": {
+    "canonical_id": "unconditional_same_security_forward_return",
+    "kind": "unconditional_distribution",
+    "target": "forward_return:close:1bar"
+  },
+  "available_time_rule": "each feature row is usable only at max(input available_at); close signal earliest use is next bar",
+  "split": {
+    "kind": "ordered",
+    "train": {
+      "start": "2026-01-05",
+      "end": "2026-01-06"
+    },
+    "validation": {
+      "start": "2026-01-07",
+      "end": "2026-01-08"
+    },
+    "final_holdout": {
+      "start": "2026-01-09",
+      "end": "2026-01-12"
+    },
+    "label_boundary_rule": "drop sample when label_end is after its partition end",
+    "fit_scope": "train_only",
+    "final_holdout_reuse": "forbidden_after_view"
+  },
+  "primary_metric": "directional_accuracy",
+  "costs": {
+    "commission_bps": 2.0,
+    "slippage_bps": 3.0
+  },
+  "trial_group": "synthetic-volume-conditioned-momentum-v1"
+}

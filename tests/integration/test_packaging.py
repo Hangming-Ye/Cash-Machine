@@ -31,6 +31,8 @@ ACTIVE_BOT_FILES = (
     "bot-kit/skills/research-entry/SKILL.md",
     "bot-kit/skills/source-followup/SKILL.md",
     "bot-kit/skills/portfolio-research/SKILL.md",
+    "bot-kit/skills/supply-chain-research/SKILL.md",
+    "bot-kit/skills/factor-research/SKILL.md",
     "bot-kit/templates/task-brief.md",
     "bot-kit/templates/report.md",
     "bot-kit/templates/review.md",
@@ -39,6 +41,9 @@ ACTIVE_BOT_FILES = (
     "bot-kit/tasks/event-impact.md",
     "bot-kit/tasks/valuation.md",
     "bot-kit/tasks/decision-brief.md",
+    "bot-kit/tasks/supply-chain.md",
+    "bot-kit/tasks/company-thesis.md",
+    "bot-kit/tasks/factor-study.md",
 )
 
 
@@ -93,7 +98,7 @@ def _synthetic_project(tmp_path: Path) -> Path:
         "private/bot-mapping.json",
         "tests/private-fixture.txt",
         "bot-kit/contracts.md",
-        "bot-kit/tasks/company-thesis.md",
+        "bot-kit/evaluation.md",
     ):
         _write(root, excluded, "SYNTHETIC_SECRET_CANARY\n")
     return root
@@ -140,8 +145,13 @@ def test_release_bundle_is_deterministic_allowlisted_and_manifest_verified(
         assert "bot-kit/tasks/event-impact.md" in names
         assert "bot-kit/skills/source-followup/SKILL.md" in names
         assert "bot-kit/skills/portfolio-research/SKILL.md" in names
+        assert "bot-kit/skills/supply-chain-research/SKILL.md" in names
+        assert "bot-kit/skills/factor-research/SKILL.md" in names
         assert "bot-kit/tasks/valuation.md" in names
         assert "bot-kit/tasks/decision-brief.md" in names
+        assert "bot-kit/tasks/supply-chain.md" in names
+        assert "bot-kit/tasks/company-thesis.md" in names
+        assert "bot-kit/tasks/factor-study.md" in names
         assert "fixtures/requests/example.json" in names
         assert "fixtures/ingest/document.md" in names
         assert "fixtures/ingest/excerpt.txt" in names
@@ -159,7 +169,7 @@ def test_release_bundle_is_deterministic_allowlisted_and_manifest_verified(
             for name in names
         )
         assert "bot-kit/contracts.md" not in names
-        assert "bot-kit/tasks/company-thesis.md" not in names
+        assert "bot-kit/evaluation.md" not in names
         assert b"SYNTHETIC_SECRET_CANARY" not in b"".join(
             archive.read(name) for name in names
         )

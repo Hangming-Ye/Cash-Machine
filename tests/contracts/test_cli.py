@@ -84,7 +84,13 @@ def test_all_approved_command_groups_reject_incomplete_requests_or_unimplemented
         ["--root", str(tmp_path), *command, str(request_path)],
     )
 
-    if operation in {"check.artifact", "memory.recall", "memory.apply", "compute.valuation"}:
+    if operation in {
+        "check.artifact",
+        "memory.recall",
+        "memory.apply",
+        "compute.valuation",
+        "compute.factor",
+    }:
         assert envelope["error"]["reason"] == "invalid"
     else:
         assert envelope["error"]["reason"] == "unsupported"

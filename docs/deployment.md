@@ -2,7 +2,7 @@
 
 This procedure packages code on the Windows development workspace and installs it manually in a versioned application directory on the private Grok cloud computer. It does not deploy by itself, change a Routine, install a background service, monitor health, send notifications, or alter persistent research data.
 
-The target cloud OS, Python inventory, permissions, private project root, and Bot/Routine mapping are still unavailable because T001 is blocked. Replace every angle-bracket path only after it is verified on the target. Do not treat the example `/workspace/cash-machine` path or any Bot name as confirmed live configuration.
+T001 has a local preflight record. The verified private cloud project root and Bot/Routine mapping are not used in this development cycle; local packaging and install replay do not require them. Replace every angle-bracket path only after it is verified on a future target. Do not treat the example `/workspace/cash-machine` path or any Bot name as confirmed live configuration, and do not claim a cloud install from this procedure alone.
 
 ## 1. Build a reviewable bundle on Windows
 
@@ -27,12 +27,15 @@ The ZIP is deterministic for the same input bytes: entries are ordinal-sorted, u
 
 ### Allowlisted contents
 
+Matches `scripts/install.ps1` `$requiredFiles`, every `src/cash_research/**/*.py` (excluding `__pycache__`), and the synthetic fixture trees the script packs:
+
 - `pyproject.toml` and `uv.lock`;
-- Python files under `src/cash_research/`;
 - `config/settings.example.json` only;
 - `scripts/install.ps1`, `scripts/run_fixtures.py`, and this deployment guide;
-- the active Bot files listed by `bot-kit/README.md`: six prompts, research-entry, research-memory, source-followup, and portfolio-research Skills, task brief, report, and the migrated review, event-impact, valuation, and decision-brief methods;
-- synthetic/contract fixtures from the explicit requests, scenarios, memory, sources, brokers, ingest, valuation, and factors fixture directories.
+- `fixtures/README.md` and `fixtures/scenarios/manifest.json`;
+- Python files under `src/cash_research/**/*.py`;
+- Bot kit: `bot-kit/README.md`; six prompts (`common`, `chief`, `research`, `market`, `quant`, `reviewer`); Skills `research-memory`, `research-entry`, `source-followup`, `portfolio-research`, `supply-chain-research`, and `factor-research`; templates `task-brief.md`, `report.md`, and `review.md`; tasks `review.md`, `retrospective.md`, `event-impact.md`, `valuation.md`, `decision-brief.md`, `supply-chain.md`, `company-thesis.md`, and `factor-study.md`;
+- synthetic/contract fixtures from `fixtures/requests`, `fixtures/scenarios`, `fixtures/memory`, `fixtures/sources`, `fixtures/brokers`, `fixtures/ingest`, `fixtures/valuation`, `fixtures/factors`, and `fixtures/reports` (extension-filtered as in the install script).
 
 The bundle excludes `.git`, `.venv`, all `.env` files including `sec-analysis.env`, credentials, `data/`, `tmp/` prior outputs, `archive/`, private Bot mappings, test output, account/holding data, and inactive legacy Bot contracts/task cards. Tests inspect synthetic secret canaries; packaging does not read a real credential file.
 

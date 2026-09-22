@@ -158,6 +158,8 @@ $requiredFiles = @(
     'bot-kit/skills/research-entry/SKILL.md',
     'bot-kit/skills/source-followup/SKILL.md',
     'bot-kit/skills/portfolio-research/SKILL.md',
+    'bot-kit/skills/supply-chain-research/SKILL.md',
+    'bot-kit/skills/factor-research/SKILL.md',
     'bot-kit/templates/task-brief.md',
     'bot-kit/templates/report.md',
     'bot-kit/templates/review.md',
@@ -165,7 +167,10 @@ $requiredFiles = @(
     'bot-kit/tasks/retrospective.md',
     'bot-kit/tasks/event-impact.md',
     'bot-kit/tasks/valuation.md',
-    'bot-kit/tasks/decision-brief.md'
+    'bot-kit/tasks/decision-brief.md',
+    'bot-kit/tasks/supply-chain.md',
+    'bot-kit/tasks/company-thesis.md',
+    'bot-kit/tasks/factor-study.md'
 )
 foreach ($relative in $requiredFiles) {
     Add-ReleaseFile -RelativePath $relative

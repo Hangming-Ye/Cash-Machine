@@ -1,24 +1,26 @@
 # Quickstart 与验收路径（实施后使用）
 
-本文件描述目标执行方式，**当前只有设计文档，命令、fixtures 与测试尚未实现**。Plan 已批准，完成相应实施任务后才执行；不能把下列命令当作本轮已跑结果。
+本文件描述本机与目标环境的执行方式。本地 Windows 可复走安装与合成 fixture 链；不把下文当作原生 Grok、live 券商或云端部署已通过的证据。
 
 ## 1. 环境与安装
 
-目标为 Grok Bot 的共享云电脑。先记录产品版本、可用的 Skill／Routine／终端入口和 Python 环境；原生模型信息不可见时记录不可见。在私有工作区保存 bot-mapping.json：现有 Bot／Routine 的名称或可用标识、职责、Skill 入口、资料路径及主题写入负责人。确认 `/workspace/cash-machine/` 为私有项目目录，并按用户现有配置取得只读凭证来源，不在聊天粘贴秘密。
+目标运行时仍是 Grok Bot 的共享云电脑，但**本轮要求是本机 Windows 复走**，不是完成云端部署。云路径（例如 `/workspace/cash-machine/`）仅作未来目标示例。先记录产品版本、可用的 Skill／Routine／终端入口和 Python 环境；原生模型信息不可见时记录不可见。在私有工作区保存 bot-mapping.json：现有 Bot／Routine 的名称或可用标识、职责、Skill 入口、资料路径及主题写入负责人。凭证按用户现有配置只读取得，不在聊天粘贴秘密。
 
-实施后的项目应有 pyproject.toml、uv.lock、fixtures 及实际 CLI。进入部署的 app 目录后执行：
+本机项目含 `pyproject.toml`、`uv.lock`、fixtures 与实际 CLI（包版本 **0.1.0**）。在仓库根目录用项目 venv 复走：
 
-```sh
-uv sync --locked
-uv run cash-research --help
-uv run pytest tests/unit tests/contracts
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/integration/test_packaging.py -q --tb=line
+& 'C:\Users\Public\PowerShell\7\pwsh.exe' -NoProfile -File .\scripts\install.ps1 `
+  -Root (Resolve-Path .).Path `
+  -OutputPath (Join-Path (Resolve-Path .).Path 'tmp\releases\cash-research-0.1.0-local-replay.zip')
+.\.venv\Scripts\cash-research.exe --help
 ```
 
-若依赖或 Python 不兼容，先按锁文件及安装说明修复，不靠 Bot 临时改版本凑通。Windows 开发环境可执行同类离线命令，但不替代云端运行证据。
+`install.ps1` 只在本机打出 `tmp/releases/` 下的候选 zip；这不是云端安装。若依赖或 Python 不兼容，先按锁文件及安装说明修复。
 
 ## 2. 合成材料的首个完整样例
 
-实现应提供下列固定、无秘密的请求文件，内容满足 data-model 和 contracts；其数值结果包含可手算的 expected 产物：
+仓库已提供下列固定、无秘密的请求文件，内容满足 data-model 和 contracts；估值与因子数值对照仓库内 expected 产物：
 
 ```text
 fixtures/requests/
@@ -34,39 +36,42 @@ fixtures/scenarios/
   deep-analysis-revision/
 ```
 
-实现后用以下入口执行完整样例（runner 由 T004 建骨架、T060 完成集成）：
+本机用项目 venv 在隔离目录跑完整样例（勿手改模板写入某次运行的 ID）：
 
-```sh
-uv run python scripts/run_fixtures.py --root /workspace/cash-machine-test --case all
+```powershell
+New-Item -ItemType Directory -Force -Path tmp\fixture-run | Out-Null
+.\.venv\Scripts\python.exe scripts\run_fixtures.py --root tmp\fixture-run --case all
 ```
 
-runner 在该测试 root 下创建独立运行目录，使用仓库中的六份请求模板，按以下顺序调用 CLI 并将返回 ID／版本填入下一请求：data ingest → memory recall → compute valuation → compute factor → check artifact --archive → memory apply。report-check.json 是包含合成 Decision／WorkRecord／Review 草稿的检查请求模板，runner 逐条实例化并归档；正文和所需附件固化后才供经验引用。原始模板不被运行结果覆盖。
+未来云端目标可用同类入口，例如 `uv run python scripts/run_fixtures.py --root /workspace/cash-machine-test --case all`；那不是本轮验收要求。
 
-模板任务归属：T022 的 evidence-ingest.json、T011 的 memory-recall.json／memory-update.json、T029 的 valuation.json、T048 的 factor-new-combination.json、T032 的 report-check.json。每份模板所需的合成来源／数据表由相应任务同时提供，runner 不造金融计算结果。
+runner 在该测试 root 下创建独立运行目录，将模板引用的 fixture 输入复制进隔离 `--root`，解析项目 `.venv` 中的 `cash-research`，按以下顺序调用 CLI 并将返回 ID／版本填入下一请求：data ingest → memory recall → compute valuation → compute factor → check artifact --archive → memory apply。原始仓库模板不被运行结果覆盖。它只是离线／合成验证辅助，不成为生产调度器。
 
-runner 记录每步命令、实际输入／输出与预期对照；任何失败明确报出，不继续伪造下游 ID。初始记忆可为空，应用更新时填实际 expected_version。重复运行使用新的测试运行目录，不覆盖前次结果；运行范围限测试 root，真实账户数据不参与此样例。它只是离线／合成验证辅助，不成为生产调度器。
+模板任务归属：T022 的 evidence-ingest.json、T011 的 memory-recall.json／memory-update.json、T029 的 valuation.json、T048 的 factor-new-combination.json、T032 的 report-check.json。runner 对照 `fixtures/valuation/expected.json` 与 `fixtures/factors/expected.json` 中已有数值；没有数值 expected 的步骤记为 `not_applicable`，不编造金融结果。
+
+任何失败明确报出并停止链，不继续伪造下游 ID。初始记忆可为空，应用更新时填实际 expected_version。重复运行使用新的测试运行目录，不覆盖前次结果；真实账户数据不参与此样例。
 
 通过：取数材料出处保留；数值与 expected 一致；合法新因子组合被运行而非退回开发；主题更新可回查旧版；缺字段／越界路径／任意代码字符串被拒绝；artifact 检查不声称金融语义正确。
 
 ## 3. 原生 Grok 入口验证
 
-在现有 Bot 上配置草案 Description 和研究 Skill，先手工跑合成案例；无需新建 Bot。示例请求：
+**本轮未跑。** 在现有 Bot 上配置草案 Description 和研究 Skill，先手工跑合成案例；无需新建 Bot。示例请求：
 
 > 使用投研方法读取给定的虚构公司材料及相关经验，解释本轮变化、支持与反证、价格条件和下一验证点。需要计算时使用既定命令；完成后将判断草稿用 check artifact --archive 归档，再更新该测试主题摘要。结果在本会话交付，保留来源。
 
-从新会话、隔离的测试 Routine、另一专员原生交接分别调用同一方法。测试 Routine 在现有 Bot 上临时创建，保持计划禁用，指令明确指向 /workspace/cash-machine-test 与合成输入，只用 Test run；先检查指令与路径及生产研究文件的版本／摘要，再执行，结束后核对生产文件未改；测试项不接真实来源。不得默认现有生产 Routine 支持单次路径覆盖，也不修改其生产计划。若产品不能禁用后单次试跑，暂用手工同指令验证并将 Routine 项标未通过，不能冒称测试完成。
+从新会话、隔离的测试 Routine、另一专员原生交接分别调用同一方法。测试 Routine 在现有 Bot 上临时创建，保持计划禁用，指令明确指向隔离测试根与合成输入，只用 Test run；先检查指令与路径及生产研究文件的版本／摘要，再执行，结束后核对生产文件未改；测试项不接真实来源。不得默认现有生产 Routine 支持单次路径覆盖，也不修改其生产计划。若产品不能禁用后单次试跑，暂用手工同指令验证并将 Routine 项标未通过，不能冒称测试完成。
 
 通过：实际读取相关材料并在研究中使用；专员无父会话也能完成；输入和结果归属正确；手机和 PC 查看相同内容。失败分清入口未调用、资料未取到、压缩错误或读到但未使用；先修方法和入口，不增加调度系统。
 
-## 4. 现有来源只读验证（覆盖探测在完整功能实施前执行）
+## 4. 现有来源只读验证（本轮未跑 live probe）
 
-为每个现有 source 建私有请求文件，不含秘密：
+**本轮未对六源做 live 探测。** 源侧缺口见 [data-sources.md](data-sources.md) 的 G-01—G-08，不要把未跑的 probe 写成已通过。为每个现有 source 建私有请求文件，不含秘密：
 
 ```sh
 uv run cash-research --root /workspace/cash-machine --config /private/path/settings.json data fetch --request /private/path/positions-request.json
 ```
 
-这里 `/private/path/` 是部署者替换的受保护实际路径，不是要求创建固定系统目录。凭证通过环境或显式 env-file 读取，禁止回显。
+这里 `/private/path/` 与 `/workspace/...` 是未来部署者替换的示例路径，不是本轮本机要求。凭证通过环境或显式 env-file 读取，禁止回显；默认不加载 `sec-analysis.env`。
 
 分别验证 Finnhub 报价／新闻、Tiingo US 日线、FMP stable 公司／财报、AKShare CN 数据、IBKR Flex、长桥账户／持仓／成交；长桥自选先检查云端现有实现。记录权限、时间、单位、覆盖、空值／失败／部分成功。真实结果仅私有保存，可脱敏交验收。
 

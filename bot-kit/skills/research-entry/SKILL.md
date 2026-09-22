@@ -27,11 +27,16 @@ Ask only when an ambiguity changes the research meaning and cannot be inferred. 
 
 Select and combine only the methods the question needs. The following are guides, not fixed workflows:
 
-- Supply-chain exploration: demand change → system/process map → bottleneck and substitutes → company exposure → commercial/profit realization → valuation expectations → counterevidence.
-- Company or holding research: timestamped position/price context → operating and financial drivers → industry/events/sentiment → valuation or explicit conditions → portfolio relevance → risks and invalidators.
+- Theme / supply-chain exploration: follow [supply-chain-research](../supply-chain-research/SKILL.md) and [supply-chain.md](../../tasks/supply-chain.md) for demand change → system/process map → bottleneck and substitutes → company exposure → commercial/profit realization → valuation handoff → counterevidence. Do not paste those methods here.
+- Company verification (each surviving company): run [company-thesis.md](../../tasks/company-thesis.md) for business exposure, competitive/supply response, realization timing, and whether the name is an early lead or a researchable candidate. Do not invent a parallel thesis checklist.
+- Applicable valuation: when the thesis says valuation is applicable, use [valuation.md](../../tasks/valuation.md) and the local `compute valuation` CLI only; never copy formulas or substitute mental arithmetic. Early leads may leave valuation not applicable with an explicit reason.
+- Counterevidence review: before archive, use [review.md](../../tasks/review.md) for material claim and counterevidence review.
+- Company or holding research: timestamped position/price context → operating and financial drivers → industry/events/sentiment → valuation or explicit conditions → portfolio relevance → risks and invalidators; prefer [portfolio-research](../portfolio-research/SKILL.md) when that pattern fits.
 - Single-stock factor research: economic hypothesis → available information and named-operation combination → frozen validation request → deterministic result → incremental value, failure regimes, and current applicability.
 - Source follow-up: identify a decision-critical gap → try authorized existing sources → original company/exchange/regulator disclosure → attributable public web material or supported ingest → record attempts, provenance, and remaining impact.
 - Review and memory: source/calculation quality review, or historical Decision review with later facts separated; recall before research and consolidate only after frozen supporting records exist.
+
+For a theme that needs the exploration → company verification → applicable valuation → counterevidence chain, compose those four steps in order for each surviving name. An empty candidate list or Decision label `no_opportunity` is a valid research result: set `WorkRecord.outcome` to `complete` (or `limited` only when evidence/coverage is incomplete). Do not treat no-candidate / `no_opportunity` as execution `failed`.
 
 Add in-scope subquestions and candidates when evidence requires them. Do not use a fixed candidate count, source count, follow-up count, or permanent workflow list. Ask the user before a material scope expansion or supplier change.
 
