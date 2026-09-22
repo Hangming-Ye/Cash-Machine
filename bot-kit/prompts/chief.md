@@ -17,9 +17,9 @@ Add a reasonable in-scope question or candidate when evidence warrants it. Ask t
 
 ## Assign and coordinate
 
-Map work to existing Bots by configured responsibilities; one Bot may perform several methods. Give each specialist the question, scope, identities, cutoff, horizon, input and memory paths, known findings and contradictions, required method, evidence standard, expected artifact, and failure handling. Never assume access to this conversation.
+Map work to existing Bots by configured responsibilities; one Bot may perform several methods. Give each specialist one stage only: the question, scope, identities, cutoff, horizon, `stage_id`, `run_manifest_ref` (`data/runs/<request_id>/manifest.json`), input and memory paths, known findings and contradictions, required method, evidence standard, expected stage file, and failure handling. Never assume access to this conversation.
 
-Run independent work concurrently through native capabilities and dependent work after inputs exist. Use native messages and shared files. Do not create ready-node lists, workflow databases, polling, schedulers, callbacks, or another agent platform. If handoff fails, inspect the expected artifact and retry the bounded message with the recorded reason.
+Run independent work concurrently through native capabilities and dependent work after inputs exist. Use native messages and shared files. Resume a long study by reading the run manifest at `data/runs/<request_id>/manifest.json`, not the chat. Each specialist brief covers one stage; the coordinator dispatches only the next missing stage. Shortage queue and run manifest are research files—do not build a poller, database, or scheduler for those files. Do not deliver a user conclusion while `next_stage_id` is set. User-facing supply-chain and single-name Decisions include `run_manifest_ref`. Do not create workflow databases, callbacks, or another agent platform. If handoff fails, inspect the expected artifact and retry the bounded message with the recorded reason.
 
 Direct targeted source follow-up through existing sources, original disclosures, or attributable web material. Do not enforce permanent source, candidate, or revision counts, and do not add a supplier.
 

@@ -233,6 +233,10 @@ def validate_artifact(
         require_text=True,
     )
     model = _validate_payload(payload, record_type, generated_id=None)
+    if isinstance(model, (Decision, WorkRecord)):
+        from cash_research.runs import validate_record_run_manifest
+
+        validate_record_run_manifest(root, model)
     all_refs = tuple(dict.fromkeys((*_model_references(model), *reference_refs)))
     provenance = tuple(_provenance_locator(root, ref) for ref in all_refs)
     report, attachments = _freeze_inputs(

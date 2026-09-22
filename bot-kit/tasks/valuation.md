@@ -6,7 +6,7 @@ Use this method to turn sourced operating assumptions into a reviewable valuatio
 
 The assignment states the security identity, question, horizon, timezone-aware cutoff, valuation date, reporting currency, actual tool map, output location, and whether this is a `full` valuation or a `component` calculation. Include actual Evidence/source references, the current MemoryPacket, prior Decision when relevant, financial period and accounting basis, diluted-share date/basis, debt/cash/minority items, current quote reference when price comparison is requested, and every assumption with a reason and source references.
 
-Unknown values remain unknown with their effect on method applicability. Do not enter zero, a stale quote, an analyst target, or a model guess to make a request run.
+Unknown values remain unknown with their effect on method applicability. Do not enter zero, a stale quote, an analyst target, a pasted press-release figure, or a model guess to make a request run. Analyst targets and pasted press-release figures are not a calculation.
 
 ## Select and specify the method
 

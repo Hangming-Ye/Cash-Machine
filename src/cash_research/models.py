@@ -77,6 +77,7 @@ class WorkRecord(ContractModel):
     output_refs: tuple[Reference, ...]
     outcome: ExecutionOutcome
     limitations: tuple[str, ...]
+    run_manifest_ref: str | None = None
 
 
 class SourceResult(ContractModel):
@@ -256,6 +257,7 @@ class Decision(ContractModel):
     invalidators: tuple[str, ...]
     previous_id: str | None = None
     memory_packet_refs: tuple[Reference, ...]
+    run_manifest_ref: str | None = None
 
     @model_validator(mode="after")
     def explain_missing_price(self) -> "Decision":

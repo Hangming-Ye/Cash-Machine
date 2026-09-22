@@ -6,13 +6,15 @@ Copy this template for one bounded assignment. Replace every angle-bracket field
 
 - Caller-assigned request ID: `<request_id>`
 - Caller-assigned task ID: `<task_id>`
+- Stage ID for this assignment only: `<stage_id>`
+- Run manifest reference: `<data/runs/<request_id>/manifest.json or not_applicable>`
 - Parent request ID, if any: `<request_id or not_applicable>`
 - Responsible existing Bot / method owner: `<mapped responsibility>`
-- Owned output path: `<workspace-relative draft/result path>`
+- Owned output path: `<workspace-relative stage file path for this stage_id only>`
 - Upstream artifact(s): `<immutable paths/IDs or none>`
 - Downstream recipient and expected handoff: `<recipient, artifact, and location>`
 
-Caller-assigned IDs correlate this assignment. They are not program-generated `rec_...` records, `mem_...` packets, Evidence IDs, calculation IDs, or experiment IDs.
+Caller-assigned IDs correlate this assignment. They are not program-generated `rec_...` records, `mem_...` packets, Evidence IDs, calculation IDs, or experiment IDs. This assignment must not perform later stages; write only the owned stage file and leave subsequent `stage_id` values to later briefs.
 
 ## Question and decision context
 

@@ -27,9 +27,9 @@ Work the checks in order. Keep every material numeric claim tied to a source or 
    Place the company on a commercialization path with dated or windowed evidence: development, sampling, qualification, production, order, shipment, or revenue. State when commercial realization would show up in reported or observable metrics under the research horizon. Do not advance a stage by implication. Missing current revenue is a stage fact, not automatic rejection.
 
 4. **Valuation expectations**  
-   Hand off to `bot-kit/tasks/valuation.md` and the existing `compute valuation` CLI when the company is ready for a valuation judgment. The program calculates; do not paste DCF, multiple, SOTP, or other formulas into this task, and do not improvise arithmetic.  
-   - For an **early lead**, valuation is often not yet applicable: record `valuation_status: not_applicable` with the missing inputs or maturity reason, and keep price-dependent conclusions out of scope.  
-   - For a **researchable candidate**, build or refresh the valuation request per the valuation task, invoke the verified launcher, and interpret returned scenarios against cited operating assumptions. Separate fundamental range, market-implied expectations, and catalysts that would change either.  
+   Hand off to `bot-kit/tasks/valuation.md` and the existing `compute valuation` CLI when the economics can be expressed with sourced inputs. The program calculates; do not paste DCF, multiple, SOTP, or other formulas into this task, and do not improvise arithmetic. Analyst targets and pasted press-release figures are not a calculation. News, guidance, and a quote alone are not the quantitative path.  
+   - Build or refresh the valuation request per the valuation task, invoke the verified launcher, and interpret returned scenarios against cited operating assumptions and a sourced quote (which operating assumptions the price already implies). Separate fundamental range, market-implied expectations, and catalysts that would change either.  
+   - `valuation_status: not_applicable` only after a recorded follow-up shows a stated input is still missing; that blocks the price conclusion only. It does not finish a user-requested company or holding judgment, and does not turn a mid-run early lead into a complete user answer.  
    Check the assignment's actual tool map before invocation:
 
    ```text
@@ -43,8 +43,8 @@ Work the checks in order. Keep every material numeric claim tied to a source or 
 
 | Label | Meaning |
 | --- | --- |
-| `early_lead` | Theme-linked exposure hypothesis exists, but commercialization stage, competitive/supply response, timing, or inputs needed for valuation remain incomplete. Useful for follow-up, not a recommendation. |
-| `researchable_candidate` | Exposure to the stated change, competitive and supply response, realization timing, valuation handoff (applicable method run or explicit not-applicable with limited consequence), catalysts, and kill conditions have all been checked with cited evidence. Still not a buy/sell decision. |
+| `early_lead` | Theme-linked exposure hypothesis exists, but commercialization stage, competitive/supply response, timing, or valuation inputs remain incomplete mid-run. Useful for follow-up; not a recommendation and not a finished user-facing conclusion for a requested study. |
+| `researchable_candidate` | Exposure to the stated change, competitive and supply response, realization timing, program valuation (or recorded inapplicability after follow-up that only limits the price conclusion), catalysts, and kill conditions have all been checked with cited evidence. Still not a buy/sell decision. |
 | `no_opportunity` | After the checks above, the company is not a qualified opportunity for this theme and horizon. Valid research result, not an execution failure. |
 | `rejected` | Evidence affirmatively overturns the thesis for this company and theme. |
 | `blocked` / `partial` | Required inputs missing or only a narrower source summary is possible. Method defect or evidence limit is labeled separately from `no_opportunity`. |

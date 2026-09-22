@@ -18,7 +18,8 @@
 | `compute valuation --request FILE` | method、来源和情景假设 | 估值与敏感性表、计算依据和警告；不会自动写 buy／sell |
 | `memory recall --request FILE` | 当前问题、证券／主题／方法、context_mode、as_of、材料预算；review 模式另含 decision_id、review_at | MemoryPacket、版本及选中／排除依据；无命中与检索失败分开；当前／历史／复盘规则见下文 |
 | `memory apply --proposal FILE` | Bot 提出的主题／经验更新、source_refs、expected_version | 新版本及旧版引用，或字段／引用／冲突错误；不覆盖原始证据，无自动删除原始记录 |
-| `check artifact --request FILE [--archive]` | 草稿路径、record_type（Decision／WorkRecord／Review）、引用列表；更正关联旧记录 ID | 默认只检查；显式 --archive 在检查通过后保存新不可变记录并返回 ID／路径；不承诺判断自然语言真实性 |
+| `check artifact --request FILE [--archive]` | 草稿路径、record_type（Decision／WorkRecord／Review）、引用列表；更正关联旧记录 ID | 默认只检查；显式 --archive 在检查通过后保存新不可变记录并返回 ID／路径；若草稿含 `run_manifest_ref`，则加载该工作区相对 JSON，在 manifest 不完整、乱序或缺 required 阶段时拒绝；不承诺判断自然语言真实性，也不判断经济真伪 |
+| `check run --request FILE` | FILE 即为 run manifest（`data/runs/<request_id>/manifest.json`） | 打印 JSON：`status`、`next_stage_id`、`missing`；manifest 无效退出码 2；文件可读即使仍有未完成阶段也退出 0，由调用方按 `next_stage_id` 继续；不归档、不启动循环；不判断经济真伪 |
 
 T033 的本地实现已将两类券商只读 operation 接入 `data fetch`，只在适配器返回通过共享模型校验的账户关联与覆盖时发布 `PortfolioSnapshot`；partial snapshot 保留 `complete_read=false`，失败不生成快照，完整且明确空读取才可 `confirmed_empty=true`。这只证明 MockTransport／fake SDK 集成，不证明 live 权限。
 
@@ -26,7 +27,9 @@ T033 的本地实现已将两类券商只读 operation 接入 `data fetch`，只
 
 ## 判断与复盘归档入口
 
-Bot 将 Decision／WorkRecord／Review 草稿及报告写到任务自己的暂存目录，随后显式调用 `check artifact --request FILE --archive`。基础请求保留 `draft_ref`、`record_type`、`reference_refs`；需固化报告时另传 `report_ref`、`attachment_refs`，修正已有 Decision 时由草稿的 `previous_id` 指向旧记录并可传 `change_explanation`。程序校验相应模型、引用、路径和秘密字段；通过后生成记录 ID，将正文及需固化附件保存到 `data/records/<record_id>/`，返回 canonical record、report body、各 attachment 与 hash manifest 的类型化 ID／路径。manifest 保存源文件和归档文件哈希、memory packet 关联，以及相对旧 Decision 的结构化字段差异；差异只说明字段值改变，不宣称程序理解金融原因。引用已归档证据时不重复复制；不得只指向仍可被改写的草稿来代表历史报告。
+Bot 将 Decision／WorkRecord／Review 草稿及报告写到任务自己的暂存目录，随后显式调用 `check artifact --request FILE --archive`。基础请求保留 `draft_ref`、`record_type`、`reference_refs`；需固化报告时另传 `report_ref`、`attachment_refs`，修正已有 Decision 时由草稿的 `previous_id` 指向旧记录并可传 `change_explanation`。程序校验相应模型、引用、路径和秘密字段；草稿可选的 `run_manifest_ref` 是唯一触发 run 完整性检查的字段——省略该字段的草稿仍可通过；设置后若 manifest 不完整则拒绝（不得把缺阶段当成成功的 limited 归档）。通过后生成记录 ID，将正文及需固化附件保存到 `data/records/<record_id>/`，返回 canonical record、report body、各 attachment 与 hash manifest 的类型化 ID／路径。manifest 保存源文件和归档文件哈希、memory packet 关联，以及相对旧 Decision 的结构化字段差异；差异只说明字段值改变，不宣称程序理解金融原因。引用已归档证据时不重复复制；不得只指向仍可被改写的草稿来代表历史报告。
+
+`check run --request FILE` 的 FILE 是研究 run manifest 本身。它只报告下一阶段，不归档，也不启动调度或轮询。
 
 不带 `--archive` 不写正式记录；校验失败不形成已归档记录。更正生成新 ID，保留 previous_id／被更正引用，不覆盖旧文件。Bot 不直接改正式历史记录。memory apply 只更新摘要与经验，不能替代判断归档。这里复用原命令组，未增加服务或审批流程。
 

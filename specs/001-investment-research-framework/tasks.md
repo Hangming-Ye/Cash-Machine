@@ -227,6 +227,14 @@ Evidence: local Cursor CLI + subagent specialist in `data/validation/us6-memory.
 **T060 audit evidence**：2026-09-22 本机 Cursor。`README.md`、`bot-kit/README.md`、`quickstart.md` 改为本地 0.1.0 实现说明，不声称原生 Grok、live 券商或云端安装。`python scripts/run_fixtures.py --root tmp/fixture-run-t060 --case all` 退出码 0，六步均执行：ingest/recall/valuation/archive/apply 为 ok，factor 为 partial（样本不足，与 expected 的 null directional_accuracy 对照 matched）。估值对照 matched。返回 ID 由 runner 填入后续请求。记录在 `tmp/fixture-run-t060/runs/fixtures/20260922T085730Z-4c1bfe05ce/step-results.json`。packaging 3 passed、1 skipped。G-01—G-08 仍是缺口。
 - [ ] T061 持续更新 `specs/001-investment-research-framework/acceptance.md` 的脱敏 FR／SC 证据映射和未执行／受阻／通过项；从 T004 骨架起即可维护，不等待完整案例通过；此任务仅在 T057—T060 全部完成且所有 SC 通过后勾选并宣布完成，否则保留具体阻塞，不能静默改标准或采购新源（报告维护依赖 T004；最终关闭依赖 T057—T060）。
 
+## Phase 10: 2026-09-22 研究深度对齐（A-07 / TD-09）
+
+目标：落实修订后的 US1／US2 阶段深度。本机方法文件在同日文档修订中已对齐阶段门；以下任务为剩余证明，不重复已做的文档改写。不新建调度器、状态机、数据库或供应商。T039 本地证据不满足 T063／T064。
+
+- [ ] T062 核对 `bot-kit/tasks/supply-chain.md`、`bot-kit/skills/supply-chain-research/SKILL.md`、`bot-kit/tasks/company-thesis.md`、`bot-kit/skills/portfolio-research/SKILL.md`、`bot-kit/skills/research-entry/SKILL.md` 与修订后的 FR-003—004／FR-006／A-07 一致：BFS 至材料、短缺节点队列、阶段顺序与冻结产物交接已写入，且不存在“有限地图／停在主要组件＋`valuation_status: not_applicable`”作为被请求分析的完成出口；记录核对结果到 `data/validation/depth-method-align.md`（依赖文档修订与 TD-09；不勾选本任务仅因文档已改）。
+- [ ] T063 [US1] 完成一次真实供应链运行，按顺序分别留下：当前层 BFS 前沿工艺地图（朝材料推进，命名组件非不透明叶子）、公司／竞争表、下游需求、一次瓶颈检验、仅含通过该检验节点的短缺队列及对入队节点的再拆产物（若有）、定价判断，以及程序估值或补证后仍不适用的记录；检验前入队、一份合并长文、停在不透明组件、或深度优先钻入名企后停止，不通过。T039 本地合成链证据不满足本任务（依赖 T062）。
+- [ ] T064 [US2] 完成一次真实单票定量运行：有来源经营驱动桥、`compute valuation`、与有来源报价对照并陈述隐含假设；新闻与报表汇编不通过。T039 本地证据不满足本任务（依赖 T062）。
+
 ## Dependencies & Execution Order
 
 依赖表示实施任务先后。按 TD-08，本次开发的验证任务以本机 Cursor 证据勾选，不因 live 或云端保持未完成。
@@ -275,8 +283,8 @@ T004 → T061（验收汇总可持续更新；最终勾选另需 T057…T060 通
 | 范围 | 实现任务 | 主要验收任务 |
 | --- | --- | --- |
 | FR-001—002 开放范围与三市场 | T013、T023、T031、T036—T038、T047 | T034、T039、T049、T057 |
-| FR-003—004 供应链探索与候选验证 | T030、T035—T038 | T039、T057 |
-| FR-005—007 综合判断／价格／券商 | T026—T033 | T034、T057、T058 |
+| FR-003—004 供应链探索与候选验证 | T030、T035—T038、T062 | T039、T057、T063；T039 本地证据不满足 T063 |
+| FR-005—007 综合判断／价格／券商 | T026—T033、T062 | T034、T057、T058、T064；T039 本地证据不满足 T064 |
 | FR-008—010 单票因子与验证 | T040—T048 | T046、T049、T057 |
 | FR-011—014 多类来源／追溯／补证／结果区分 | T006—T007、T017—T024 | T025、T057、T058 |
 | FR-015—019 原生运行／充分岗位方法／确定性与统一交付 | T009、T012—T015、T030、T041—T048 | T016、T046、T058 |

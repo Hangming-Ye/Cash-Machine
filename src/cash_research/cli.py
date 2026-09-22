@@ -49,6 +49,7 @@ from cash_research.memory import (
     recall_memory,
 )
 from cash_research.sources.router import data_fetch_handler, data_ingest_handler
+from cash_research.runs import RunCheckResult, check_run_manifest
 
 
 OperationHandler: TypeAlias = Callable[..., CallResult]
@@ -121,6 +122,9 @@ def build_parser() -> argparse.ArgumentParser:
     artifact.add_argument("--request", dest="request_file", type=Path, required=True)
     artifact.add_argument("--archive", action="store_true")
     artifact.set_defaults(operation="check.artifact")
+    run = check_commands.add_parser("run")
+    run.add_argument("--request", dest="request_file", type=Path, required=True)
+    run.set_defaults(operation="check.run", archive=False)
     return parser
 
 
@@ -175,6 +179,22 @@ def main(
                 ) from exc
             if request["source"] not in settings.enabled_sources:
                 raise CliUnsupportedError("source is disabled by the active configuration")
+        if operation == "check.run":
+            checked = _check_run_from_request(
+                root=settings.root,
+                request_file=args.request_file,
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": checked.status,
+                        "next_stage_id": checked.next_stage_id,
+                        "missing": list(checked.missing),
+                    },
+                    ensure_ascii=False,
+                )
+            )
+            return 0
         result = execute_operation(
             operation,
             settings=settings,
@@ -261,6 +281,20 @@ def execute_operation(
             message="operation is not implemented in the current slice",
         )
     return handler(root=settings.root, settings=settings, request=request)
+
+
+def _check_run_from_request(
+    *,
+    root: Path,
+    request_file: Path,
+) -> RunCheckResult:
+    """Validate a run manifest file and report the next incomplete stage."""
+
+    try:
+        relative = request_file.resolve(strict=True).relative_to(root.resolve(strict=True)).as_posix()
+    except (OSError, ValueError) as exc:
+        raise CliInputError("check run request must be a file under the workspace root") from exc
+    return check_run_manifest(root, relative)
 
 
 def _check_artifact_result(

@@ -68,9 +68,9 @@ When a decision-critical source is missing or conflicting, invoke the source-fol
 
 ### 5. Valuation and price conditions
 
-Use `bot-kit/tasks/valuation.md`. Research every input and reason, then prepare the T030 request shape. Call `compute valuation` only through the verified CLI and read status, applicability, scenarios, failed sensitivity cells, units, references, and warnings. The program computes; the model does not replace it.
+Use `bot-kit/tasks/valuation.md`. For a requested company or holding conclusion, quantitative valuation is required when the economics can be expressed with sourced inputs. Research every input and reason, then prepare the T030 request shape. Call `compute valuation` only through the verified CLI and read status, applicability, scenarios, failed sensitivity cells, units, references, and warnings. The program computes; the model does not replace it. Compare with a sourced quote to state which operating assumptions the price already implies. Analyst targets and pasted press-release figures are not a calculation. Do not stop at news, guidance, and a quote.
 
-Separate fundamental range, market-implied assumptions, price/entry or exit conditions, and technical levels. State the horizon and evidence behind each. Do not average incompatible outputs or turn an inapplicable method into a price.
+Separate fundamental range, market-implied assumptions, price/entry or exit conditions, and technical levels. State the horizon and evidence behind each. Do not average incompatible outputs or turn an inapplicable method into a price. `not_applicable` only after recorded follow-up shows a stated input is still missing, and that blocks the price conclusion only—not a finished user answer for a requested study.
 
 ### 6. Counter-case and expiry
 

@@ -1,11 +1,11 @@
 ---
 name: supply-chain-research
-description: Explore a theme through demand, chain stages, bottlenecks, substitutes, company exposure, and profit realization with memory recall, source fallback, and no fixed candidate quota.
+description: Explore a theme with a BFS process map toward materials, quantified demand, one bottleneck test, then a shortage-queue recurse, price-in, and program valuation.
 ---
 
 # Supply-Chain Research
 
-Use this Skill when the user gives a theme, system change, or open-ended industry goal and needs early discovery or candidate screening. It implements the Serenity-style sequence inside the existing Bot workflow: demand change → system/process map → bottleneck and substitutes → company exposure → commercial/profit realization → valuation handoff → counterevidence. It supports human decisions and never submits, changes, or cancels an order.
+Use this Skill when the user gives a theme, system change, or open-ended industry goal and needs discovery or candidate screening. It implements the Serenity-style sequence inside the existing Bot workflow: BFS process map toward materials → quantified demand → one shortage/bottleneck test → enqueue only nodes that passed that test → company exposure and profit realization → price-in → program valuation → counterevidence. It supports human decisions and never submits, changes, or cancels an order.
 
 ## Start from a standalone assignment
 
@@ -42,15 +42,16 @@ Never put credentials, non-public holdings, or protected account identifiers in 
 
 ## Research method
 
-Follow `bot-kit/tasks/supply-chain.md`. There is no fixed candidate count, layer count, source count, or retry quota. Add in-scope candidates, stages, or substitutes when evidence requires them.
+Follow `bot-kit/tasks/supply-chain.md`. There is no fixed candidate count, layer count, source count, or retry quota. Required stages leave separate frozen artifacts. An early lead file may exist mid-run; it is not the user-facing conclusion. Do not prefer a “limited evidenced map” or a stop at major components as the stopping rule.
 
-1. Restate the demand change with sourced units, period, and geography when available. Plans and forecasts stay labeled.
-2. Build an evidenced system and process map for the economically relevant stages. Prefer limited evidenced nodes over a speculative full industry tree.
-3. Test the bottleneck with capacity, yield, qualification, lead time, expansion timing, financing, and substitutes. Unknown capacity is unknown, not scarcity.
-4. Attach companies only through evidenced product, process, qualification, production, order, shipment, or revenue links. Do not recommend a company only because it sits at a bottleneck.
-5. Trace commercial and profit realization separately from the supply relation. Keep early leads distinct from investment candidates.
-6. When a candidate needs a valuation expectation, point to `bot-kit/tasks/valuation.md` and call `compute valuation` through the verified CLI. Do not copy valuation formulas into this Skill.
-7. Record the strongest counterevidence, exclusions, and what to watch next. If evidence rejects the theme framing, keep the reason and continue inside authorized scope.
+1. Breadth-first process map for the current system: full frontier of process steps, components, and constituting materials; company, role, and same-step competitors on each; evidence or explicit unknown. A named component (e.g. optical module) is not an opaque leaf if it still has materials, substrates, and process steps. Map only; do not enqueue. Do not depth-first into one famous company and stop. User illustration (inference server → optical module judged short by the later test → further decompose): method motive only; no return multiple; no required ticker.
+2. Quantify downstream demand with sourced units, period, and geography. Plans and forecasts stay labeled. Do not enqueue.
+3. One shortage/bottleneck test on named frontier nodes, using capacity, yield, lead time, qualification, or expansion. Unknown capacity is unknown, not scarcity. Do not run an earlier or weaker shortage screen.
+4. Enqueue and recurse only nodes that step 3 judged shortage or bottleneck. Non-shortage and unknown nodes stay on the map and are not recursed. Write the queue as a frozen file after the test—not a graph DB, scheduler, or state machine. Do not invent a shortage to justify another layer. If evidence cannot split further, record the stop and its effect.
+5. Attach companies only through evidenced product, process, qualification, production, order, shipment, or revenue links. Trace commercial and profit realization separately. Do not recommend a company only because it sits at a bottleneck.
+6. Price-in: program valuation versus a sourced quote.
+7. Program valuation handoff via `bot-kit/tasks/valuation.md` and `compute valuation`. Analyst targets and pasted press figures are not a calculation. Pending or `not_applicable` after mid-run does not finish a user-requested study; after recorded follow-up, missing inputs limit only the price conclusion.
+8. Record the strongest counterevidence, exclusions, and what to watch next. Rejected theme or no opportunity is valid only after the process map and the tests evidence can support.
 
 When a decision-critical source is missing or conflicting, invoke the source-followup Skill. Try another approved existing integration, then company IR, exchange or regulator filings, and attributable public web material. Keep attempts and gaps. Do not add a vendor.
 
@@ -60,19 +61,20 @@ Distinguish:
 
 - utility `CallResult.status`: `ok`, `partial`, or `error`;
 - execution `WorkRecord.outcome`: `complete`, `limited`, or `failed`;
-- research result class: complete research, limited evidence, no qualified opportunity, or execution failure;
+- research result class: complete research, limited evidence, no qualified opportunity, method defect, or execution failure;
 - Decision label for this screen: `watch` or `no_opportunity`.
 
 Rules:
 
-- Early leads with unresolved profit or valuation use `watch`, may mark `evidence_limited`, and remain useful leads, not buy recommendations.
-- When no qualified opportunity exists after an evidenced screen, deliver the screen, exclusions, and what to watch next with Decision label `no_opportunity`. That result can be a complete execution outcome; it is not an execution failure.
+- Mid-run early leads may stay open with unresolved profit or valuation; they are not buy recommendations and do not close a user-requested study.
+- When no qualified opportunity exists after the BFS-to-materials map and supported tests, deliver the screen, queue state, exclusions, and what to watch next with Decision label `no_opportunity`. That result can be a complete execution outcome; it is not an execution failure.
+- Missing a required stage or stopping at major components is a method defect, not an acceptable limited finish of a requested study.
 - Do not invent a candidate to fill a quota. Do not attach arbitrary success probabilities.
 - Holding labels `buy` / `sell` belong to company or portfolio synthesis methods, not this theme screen.
 
 ## Review, archive, and memory
 
-Use the unified phone/PC report template. Include demand change, system map, bottleneck and substitutes, candidates or explicit absence, profit path or why it fails, valuation handoff or null reason, strongest counterevidence, exclusions, gaps, next check, and memory use.
+Use the unified phone/PC report template. Include the BFS process map, quantified demand, the one bottleneck test, the shortage queue written only after that test, candidates or explicit absence, profit path or why it fails, price-in, valuation handoff or recorded inapplicability after follow-up, strongest counterevidence, exclusions, gaps, next check, and memory use.
 
 Draft a Decision and WorkRecord with real references, then archive only through the verified command:
 
