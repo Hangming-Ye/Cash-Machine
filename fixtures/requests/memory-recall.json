@@ -1,0 +1,9 @@
+{
+  "request_id": "fixture-memory-recall",
+  "query": "synthetic memory topic",
+  "context_mode": "current",
+  "as_of": "runtime",
+  "topic_ids": ["synthetic-memory-topic"],
+  "lesson_ids": [],
+  "budget": {"max_items": 5, "max_chars": 12000}
+}

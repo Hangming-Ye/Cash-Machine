@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "pattern": "periodic_delta",
+  "retained_content": [
+    "baseline",
+    "new_increment",
+    "unresolved_questions"
+  ],
+  "sources": {
+    "source-baseline.json": {
+      "available_at": "2026-01-10T00:00:00Z",
+      "claim": "synthetic baseline"
+    }
+  },
+  "candidates": [
+    {
+      "kind": "topic",
+      "id": "synthetic-capacity",
+      "known_at": "2026-02-01T00:00:00Z",
+      "index_metadata": {
+        "topics": [
+          "capacity",
+          "order-conversion"
+        ],
+        "methods": [
+          "periodic-comparison"
+        ],
+        "securities": [
+          "SYN-A"
+        ],
+        "aliases": [
+          "capacity constraint",
+          "产能约束",
+          "订单兑现"
+        ]
+      },
+      "proposal": {
+        "topic_id": "synthetic-capacity",
+        "current_thesis": "Baseline capacity remains constrained; one qualified line is the increment.",
+        "support_refs": [
+          "source-baseline.json"
+        ],
+        "opposing_refs": [],
+        "changes": [
+          "one qualified line added"
+        ],
+        "open_questions": [
+          "customer qualification timing unresolved"
+        ],
+        "next_checks": [
+          "compare shipped volume with baseline"
+        ]
+      }
+    },
+    {
+      "kind": "lesson",
+      "id": "verify-order-to-revenue",
+      "known_at": "2026-02-02T00:00:00Z",
+      "index_metadata": {
+        "topics": [
+          "commercialization"
+        ],
+        "methods": [
+          "order-to-revenue"
+        ],
+        "securities": [],
+        "aliases": [
+          "订单兑现",
+          "订单转收入"
+        ]
+      },
+      "proposal": {
+        "lesson_id": "verify-order-to-revenue",
+        "check_or_method": "Verify shipment and acceptance before mapping an order to revenue.",
+        "applies_when": "A company announces orders before customer acceptance.",
+        "source_refs": [
+          "source-baseline.json"
+        ],
+        "counterexamples": [
+          "A refundable framework order is not committed revenue."
+        ],
+        "validity": "usable",
+        "review_condition": "Review after shipment or cancellation."
+      }
+    },
+    {
+      "kind": "lesson",
+      "id": "verify-order-to-revenue-duplicate",
+      "duplicate_of": "verify-order-to-revenue",
+      "known_at": "2026-02-03T00:00:00Z",
+      "index_metadata": {
+        "topics": [
+          "commercialization"
+        ],
+        "methods": [
+          "order-to-revenue"
+        ],
+        "securities": [],
+        "aliases": [
+          "订单兑现",
+          "订单转收入"
+        ]
+      },
+      "proposal": {
+        "lesson_id": "verify-order-to-revenue-duplicate",
+        "check_or_method": "Check acceptance before treating bookings as sales.",
+        "applies_when": "Orders precede acceptance.",
+        "source_refs": [
+          "source-baseline.json"
+        ],
+        "counterexamples": [
+          "Cancelable bookings may never ship."
+        ],
+        "validity": "candidate",
+        "review_condition": "Merge with established lesson."
+      }
+    },
+    {
+      "kind": "lesson",
+      "id": "unrelated-fx",
+      "known_at": "2026-02-01T00:00:00Z",
+      "index_metadata": {
+        "topics": [
+          "currency-hedging"
+        ],
+        "methods": [
+          "fx-sensitivity"
+        ],
+        "securities": [
+          "SYN-C"
+        ]
+      },
+      "proposal": {
+        "lesson_id": "unrelated-fx",
+        "check_or_method": "Measure translation exposure.",
+        "applies_when": "Foreign revenue is material.",
+        "source_refs": [
+          "source-baseline.json"
+        ],
+        "counterexamples": [
+          "Natural hedges may offset translation."
+        ],
+        "validity": "usable",
+        "review_condition": "Review when currency mix changes."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "periodic-paraphrase",
+      "mode": "current",
+      "query": "本周订单兑现和产能约束有什么变化",
+      "expected": {
+        "selected": [
+          "data/topics/synthetic-capacity/versions/1.json",
+          "data/lessons/verify-order-to-revenue/versions/1.json"
+        ],
+        "excluded": {
+          "data/lessons/verify-order-to-revenue-duplicate/versions/1.json": "duplicate",
+          "data/lessons/unrelated-fx/versions/1.json": "unrelated"
+        }
+      },
+      "implementation_stage": "T051"
+    },
+    {
+      "id": "periodic-zero-match",
+      "mode": "current",
+      "query": "新主题没有历史记录",
+      "expected": {
+        "selected": [],
+        "normal_result": "no_history"
+      },
+      "baseline_supported": true
+    }
+  ]
+}

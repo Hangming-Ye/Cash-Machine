@@ -1,0 +1,12 @@
+{
+  "request_id": "fixture-memory-update",
+  "memory_type": "topic",
+  "expected_version": "{{expected_version}}",
+  "topic_id": "synthetic-memory-topic",
+  "current_thesis": "Synthetic capacity remains constrained.",
+  "support_refs": ["{{record_id}}"],
+  "opposing_refs": [],
+  "changes": ["Added one synthetic evidence item."],
+  "open_questions": ["When does synthetic supply arrive?"],
+  "next_checks": ["Re-read the synthetic evidence fixture."]
+}
