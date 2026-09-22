@@ -1,52 +1,58 @@
-# Bot 配置与作业包
+# Bot research method package
 
-版本0.3。用于补足岗位指令和固定金融任务，不是已经安装的Grok插件。所有文字为本项目独立编写。研究程序入口尚未实现，不能因为文档出现函数名就声称可调用。
+This directory contains offline source text for configuring the existing Grok Bots. It is not evidence that any prompt or Skill is installed, loaded, or behaving correctly in the live product. Local packaging exists from T015; native deployment and behavior remain pending T016 and the private Bot mapping from T001.
 
-## 先配置什么
+## Active load list
 
-| Bot | 常驻指令文件 | 可接作业 |
-|---|---|---|
-| 幕僚长 Chief | [chief.md](prompts/chief.md) | T06综合、T08复盘；选择5条固定流程 |
-| 产业与公司 Research | [research.md](prompts/research.md) | T02公司、T03产业链、T04估值假设 |
-| 市场与事件 Market | [market.md](prompts/market.md) | T01事件/财报/预期/宏观影响 |
-| 单票因子 Quant | [quant.md](prompts/quant.md) | T05实验协议或结果解释 |
-| 复核 Reviewer | [reviewer.md](prompts/reviewer.md) | T07引用、业务逻辑、数值一致性复核 |
+Load one shared instruction and the role files matching an existing Bot's mapped responsibilities. One Bot may hold several responsibilities; these names do not require six new Bots.
 
-每个Bot加载 [common.md](prompts/common.md) + 自己的角色文件；一次任务再附对应T文件和完整任务包。不要把全部角色、全部作业和全部研究报告一起加载。提示词使用英文便于统一工程维护，用户输出默认中文。
+| File | Version | Purpose | Offline status |
+| --- | --- | --- | --- |
+| [common.md](prompts/common.md) | v1.0 | Shared evidence, memory, status, archive, privacy, and delivery rules | Migrated source |
+| [chief.md](prompts/chief.md) | v1.0 | Framing, method composition, native handoff, synthesis, closure | Migrated source |
+| [research.md](prompts/research.md) | v1.0 | Industry, supply chain, company, holding, valuation method | Migrated source |
+| [market.md](prompts/market.md) | v1.0 | Events, earnings, expectations, macro, price, sentiment | Migrated source |
+| [quant.md](prompts/quant.md) | v1.0 | Factor hypothesis, frozen validation, interpretation | Migrated source |
+| [reviewer.md](prompts/reviewer.md) | v1.0 | Evidence, calculation, temporal, boundary, memory review | Migrated source |
+| [research-memory/SKILL.md](skills/research-memory/SKILL.md) | current T052 | Query/ID recall, task-specific consolidation, dedupe and version-safe apply | Implemented offline; native loading unverified |
+| [research-entry/SKILL.md](skills/research-entry/SKILL.md) | v1.0 | Goal/scope framing, method composition, standalone brief, artifact handoff | Implemented offline; native loading unverified |
+| [source-followup/SKILL.md](skills/source-followup/SKILL.md) | v1.0 | Existing-source, original-disclosure, research/social follow-up and gap recording | Implemented offline; native loading unverified |
+| [portfolio-research/SKILL.md](skills/portfolio-research/SKILL.md) | v1.0 | Company, holding, and watchlist research with conditions, counterevidence, expiry, and memory | Implemented offline; native loading unverified |
+| [task-brief.md](templates/task-brief.md) | v1.0 | Sufficient specialist context and ownership template | Implemented offline; native loading unverified |
+| [report.md](templates/report.md) | v1.0 | One Chinese user-facing report for mobile and PC | Implemented offline; native loading unverified |
+| [review.md](tasks/review.md) | v1.0 | Source-based quality review and historical Review distinction | Implemented offline; native loading unverified |
+| [retrospective.md](tasks/retrospective.md) | v1.0 | Due/triggered historical Decision review and lesson handoff | Implemented offline; native loading unverified |
+| [templates/review.md](templates/review.md) | v1.0 | Chinese original-versus-later historical Review template | Implemented offline; native loading unverified |
+| [event-impact.md](tasks/event-impact.md) | v1.0 | Composable event, earnings, preview, and macro impact method | Implemented offline; native loading unverified |
+| [valuation.md](tasks/valuation.md) | v1.0 | Sourced valuation assumptions, T030 request shape, applicability, and interpretation | Implemented offline; native loading unverified |
+| [decision-brief.md](tasks/decision-brief.md) | v1.0 | Holding/watchlist synthesis and lower-case Decision semantics | Implemented offline; native loading unverified |
 
-“system prompt”在此指常驻岗位指令的设计正文。Grok Bot公开文档未说明可直接替换原始system层；用Description承载岗位摘要，通过对话明确保存工作方式为私有skill，并在每次任务与Routine中明确引用。实际保存/加载效果必须用行为测试检查。API执行器才可以使用真正的system/developer消息。[官方Bot配置](https://docs.x.ai/grok-bot/bots) · [官方Skill机制](https://docs.x.ai/grok-bot/skills-routines-and-automations)
+For each Bot load `common.md`, the selected role file(s), and the complete current assignment produced through the research-entry Skill and task-brief template. Do not load every role by default. Use the report template for the same mobile/PC delivery and the review method when material claims need independent checking.
 
-## 原生Bot部署步骤
+## Capability status
 
-1. 为现有Bot匹配上述职责；先保留现有记录，不删除Bot。
-2. 在对应Bot配置中写入简短岗位描述。把common和role正文作为可信的用户指令交给Bot，明确保存成工作skill；不得仅让Bot自行总结一次便当作配置完成。
-3. 给一个完整的离线任务包和相应T文件，验证它实际按步骤返回。检查输出而不是只接受“我记住了”。
-4. 将验证后的作业保存为私有skill，命名例如 `invest-t01-event-impact-v03`；版本写在任务包里。保存后的skill需要核对，不允许省掉关键步骤。
-5. 第二个不同输入也通过后，再创建Routine；Routine引用指定skill、输入来源、固定工作流、失败回执与预算，不只写“每天分析股票”。
-6. 按 [evaluation.md](evaluation.md) 验证岗位、任务、程序和手机链路。没有程序时只做包内分析测试，禁用命令执行并标注计算尚缺。
+- The local CLI implements `data fetch`, `data ingest`, `check artifact`, and `memory recall/apply` with offline tests. The actual run must still confirm enabled configuration, entitlement, and returned coverage.
+- Public `data fetch` routing currently covers Finnhub quote/news, Tiingo bars, FMP stable profile/statements, and AKShare quote/bars/news/profile/statements. Ingest archives already obtained text/PDF/CSV/JSON material within its validated boundary; it is not a browser or network fetch.
+- IBKR Flex and Longbridge accounts/positions/executions now route through the local read-only CLI and atomically persist typed portfolio snapshots when the adapters can form one. Tests use mocked transport/SDK only: live entitlement, OAuth, account coverage, and cloud availability remain unverified. IBKR Flex is normally T+1; Longbridge is current-only within returned coverage. A failed read is never an empty portfolio.
+- `compute valuation` now runs the T030 engine and freezes the complete request, deterministic result, typed Calculation, input bytes/provenance, and manifest. Factor calculation remains pending its integration task. A local receipt proves only the supplied assumptions were calculated.
+- The source baseline remains exactly Finnhub, Tiingo, FMP stable, AKShare, IBKR Flex, and Longbridge OAuth. Native web search, company IR, and exchange/regulator filings are evidence channels. No supplier is added here.
+- Entry/task-brief, source follow-up, event impact, portfolio research, valuation, decision brief, and report/review files are implemented offline. Packaging is locally tested; native loading and behavior remain pending T016 and later story acceptance.
+- This migration creates no Routine, scheduler, notification rule, service, callback, state machine, or Bot.
 
-如果原生界面无法保存完整内容，保留版本化文件，每次任务要求先读common、role、指定task文件；把是否真实加载纳入验收，不能宣称实现了强制注入。公开分享Bot可能包含配置，分享前另外审查，不将密钥/持仓包放入共享模板。
+## Native boundary
 
-## 一次交接必须包含
+Map these methods to existing Bots after the private mapping is available. Use native Description, Skills, Routine references, shared files, terminal, and messages only as the actual product supports. Verify loaded versions through behavior with a complete isolated assignment; “I remember” is insufficient.
 
-task_id、task_type、目标对象及已解析身份、decision_at、研究问题、期限、资料与计算结果、上次判断、实际可用工具、输出路径、来源限制和budget。见 [contracts.md](contracts.md)。接收者应能在新会话里完成任务，不要求知道父会话、默认工作目录或其他Bot的思考过程。
+Independent questions may use existing concurrency; dependent work waits for inputs. Retry failed messages with the same bounded context and recorded reason. The program does not prepare ready nodes, dispatch Bots, poll completion, or deliver notifications. Mobile and PC use the same artifact. Never put credentials or non-public account data in shared templates or public outputs.
 
-## 两个可复制的调用外壳
+## Reference-only legacy material
 
-**发给专员（由幕僚长填入真实任务包）：**
+These v0.3 files remain design history and are not active authority or part of the load list:
 
-> Execute the supplied task only. Apply the common instruction, your role instruction, and task T01 v0.3. Read the attached complete task packet. The available-tools section is authoritative for this run; a named tool in documentation is not proof it exists. Return one result envelope using the specified fields. Save only to the assigned result path if file access is available; otherwise return the JSON in the chat and state that it was not saved. Send the task ID and actual result location back to Chief. Do not launch another Bot.
+- `BOT_OPERATING_SPEC.md`
+- `bot-kit/contracts.md`
+- `bot-kit/result.schema.json`
+- `bot-kit/evaluation.md`
+- `bot-kit/tasks/` old task cards, except the active migrated `review.md`, `event-impact.md`, `valuation.md`, `decision-brief.md`, and `retrospective.md`
 
-**Routine模板（配置时必须替换方括号，不可原样启用）：**
-
-> Run workflow [daily-review] for [configured watchlist] at [exchange-calendar condition / timezone]. Use version [0.3] of the agreed workflow and role/task skills. Ask the configured research program to prepare the current snapshot and ready task packets. Dispatch only those packets to the mapped Bots. Import actual results, report unresolved or overdue tasks, and publish only the finalized output. Notify the user only for material changes or required action. If the research program is unavailable, return an operational failure; do not invent a daily investment report. Record the run and delivery status.
-
-这些是配置模板，本次没有创建Routine或向其他应用发送消息。
-
-## 文档入口
-
-- [作业设计与程序分工](../BOT_OPERATING_SPEC.md)
-- [八种任务卡](tasks/README.md)
-- [数据契约与合成输入示例](contracts.md)
-- [可机器校验的输出Schema](result.schema.json)
-- [模型与运行验收案例](evaluation.md)
+Only the migrated task files listed above are active in that directory. Do not load the other legacy fixed workflows, task IDs, candidate/finding caps, one-pass review limits, registered-formula-only restrictions, ready-node scheduler concepts, or notification templates. Later tasks may activate a task file only after reconciling it with current authority and listing it above.

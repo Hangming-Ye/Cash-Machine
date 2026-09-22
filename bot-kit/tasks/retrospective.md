@@ -1,21 +1,17 @@
-# T08 Historical decision review v0.3
+# Historical decision retrospective v1.0
 
-Owner: Chief. Modes: `process` or `outcome`.
+Use this method only for an archived Decision. First read its frozen `memory_packet_refs`, evidence/calculation references, cutoff, horizon, conditions, assumptions, price references, risks, and invalidators.
 
-Required: frozen original decision, information cutoff, considered alternatives, prior evidence, intended horizon, and user choice if recorded. Outcome mode additionally needs program-produced subsequent returns, benchmark, adverse excursion and known later events. Unknown user execution remains unknown.
+Also read `bot-kit/prompts/common.md` and `bot-kit/skills/research-memory/SKILL.md`, plus the standalone assignment's actual launcher, output path, and downstream owner. Return the Review draft path, evidence/calculation references, limitations, archive result, and—only after archive—the Review ID/path for a lesson handoff.
 
-Process mode:
-The input must exclude subsequent outcomes; if outcomes are already visible, mark unblinded. The program must save this result before making the separate outcome task ready. Do not request or open the outcome file during process mode.
-1. Evaluate only the information available then. Was the business mechanism explicit, the price assumption coherent, and the strongest contrary case examined?
-2. Identify evidence that was available but missed versus information that could not have been known. Evaluate uncertainty and timing fairly.
-3. Save the process assessment before receiving the outcome packet. If later outcomes were already visible, label the assessment unblinded.
+Check whether the horizon elapsed or an archived invalidator/review condition triggered. Return `not_due`, `not_triggered`, or `inconclusive` with the next check when appropriate. If later facts are already visible, label process assessment unblinded.
 
-Outcome mode:
-1. Read the prior process assessment and actual outcome receipt; do not rewrite the original decision.
-2. Separate thesis realization, broad market/sector effects, valuation changes, timing and actual execution. Attribution beyond available data remains an interpretation.
-3. Compare only pre-registered alternatives with their recorded timing/cost rules. Do not invent a perfect hindsight trade.
-4. Propose at most one lesson with supporting cases, applicable conditions, counterexamples and a future validation plan. Keep it a candidate, never an automatic prompt or rule update.
+Keep **original inputs** exactly as frozen at `decision_as_of`; keep **later facts and lessons** separately through aware `review_at`. Never reconstruct original inputs from a current summary.
 
-Return `result` keys: `mode`, `decision_id`, `blinding_status`, `process_assessment`, `outcome_assessment`, `error_category`, `lesson_candidate`, `reopen_condition`.
+Assess thesis realization and supported causes among evidence quality, prediction, reasoning, execution, and market path. Unknown execution remains unknown. Use return, benchmark, or adverse-excursion calculations only when immutable program receipts exist; a question-specific calculation gap does not fail every review. Do not invent a hindsight-perfect trade.
 
-A profitable outcome does not prove a good decision. A loss does not prove the thesis process was bad. If the horizon has not elapsed, record pending and the next review date rather than a final score. Do not imply that a recorded intention is an executed broker trade.
+A gain does not prove process quality and a loss does not disprove it. One outcome cannot establish a universal lesson. State counterevidence, attribution uncertainty, affected assumptions/dependencies, and the next discriminating test.
+
+Draft the shared Review through [the review template](../templates/review.md). Existing `lesson_refs` may cite prior lessons. New lessons derived here wait until the Review is archived with the exact verified launcher and returned immutable Review ID/path. A failed archive creates no ID. This method creates no Routine, scheduler, state machine, notification, or order.
+
+Recall review memory with `{"request_id":"<CALLER_ID>","query":"<REVIEW_QUESTION>","context_mode":"review","as_of":"<DECISION_AS_OF>","review_at":"<REVIEW_AT>","decision_id":"<RETURNED_DECISION_ID>","topic_ids":[],"lesson_ids":[],"budget":{"max_items":<N>,"max_chars":<N>}}`. Use actual IDs and aware times; placeholders are shapes only.
