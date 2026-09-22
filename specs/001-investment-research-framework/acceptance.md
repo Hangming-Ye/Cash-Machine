@@ -6,8 +6,8 @@
 
 | Task | 状态 | 证据等级 | 记录 |
 | --- | --- | --- | --- |
-| T001 | blocked | 环境入口失败 | `tmp/preflight-report.md`；computer-use helper 在返回任何 surface 前初始化失败，未取得 Bot/Routine/云端路径事实 |
-| T002 | blocked | 未执行 | 依赖 T001；六来源和 G-01—G-08 均未 live 探测 |
+| T001 | pass | 原生 UI + Bot 自报环境清点 | 2026-09-22 原生 Grok UI 0.57.1 可见既有云端／源码路径；私有 `data/preflight/t001-native/config/bot-mapping.json` 与 `data/preflight/t001-native/data/preflight/environment.md` 记录替换前 Bot/Routine 快照。Bot 自报 Debian 13、Python 3.13.5、uv 0.12.15、44 个托管 Skill 文件及空 workflows，未取得独立原始命令日志。新 Bot 实际部署访问、Skill 调用及完整 Routine 登记留 T016。Bot 的 `uv run` 探测违反只读要求，在旧源码根创建 `.venv` 并获取 build dependencies；完整范围及完成程度未知且未清理 |
+| T002 | pass | 本地 live 只读 + 公开补证 | 私有 `data/preflight/t002-local/source-coverage.json` 记录六个既有来源的成功／部分成功／明确错误及 G-01—G-08。长桥 OAuth 直连账户／持仓读取成功，但自选与项目适配器归一化未验证；IBKR Flex 为不完整的只读快照；港股 00700 原始／qfq 序列可追溯导入但不证明 PIT／公司行动完整。状态为 `recorded_with_gaps`，不等于完整案例通过 |
 | T003 | pass | Windows 离线工程 | `uv sync --locked` 成功同步 25 packages；包与核心依赖导入成功。云端兼容性仍留 T016 |
 | T004 | pass | Windows synthetic scaffold | 主 agent 已接受 skeleton；9/8/3/6 manifest、conftest `9 8 3`、`py_compile`、runner `--help`、缺模板 exit 2/`not_run`、capture/path-escape probe 与 `git diff --check` 通过。完整链和数值 expected 对照未执行，留后续任务/T060 |
 | T005 | pass | Windows 离线测试 | 聚焦配置测试 17 passed；未加载 live 凭证，不证明云端配置可用 |
@@ -17,7 +17,7 @@
 | T009 | pass | Windows 离线 CLI 入口 | 主 agent 审核并接受；33 passed 聚焦、最终 T005—T009 合并 85 passed，lock/sync/compileall/console help/diff check 通过；未接入的处理器明确 unsupported |
 | T010 | pass | Windows 离线记忆存储 | 主 agent 审核并接受；13 passed 聚焦（含真实进程竞争），相关合并 48 passed；无原生 Grok 记忆效果结论 |
 | T011 | pass | Windows 离线记忆往返 | 主 agent 审核代码、Skill 和模板并接受；完整回归 110 passed；未证明原生 Grok 记忆使用效果 |
-| T012 | blocked | 离线 prompt 迁移通过／原生加载受阻 | 主 agent 已审核七个 prompt／加载清单文件；T001 未提供实际 Bot 映射和已加载版本，任务保持未完成 |
+| T012 | blocked | 离线 prompt 迁移通过／原生加载未验证 | 主 agent 已审核七个 prompt／加载清单文件；T001 已提供替换前 Bot 快照和 Skill 路径清点，新 Bot 实际部署后的 prompt、Skill 加载版本及原生运行仍待 T016 验证，任务保持未完成 |
 | T013 | pass | Windows 离线 Skill／模板审查 | 主 agent 审核研究入口 Skill、任务简报与静态路径并接受；原生调用留 T016 |
 | T014 | pass | Windows 离线报告／复核审查 | 主 agent 审核报告模板、复核任务和语义 diff 后接受；手机／PC 同结果留 T016 |
 | T017 | pass | Windows synthetic 来源契约 | 主 agent 审核共同来源契约；12 passed 聚焦、25 passed 来源＋共享模型回归；无 live source 结论 |
@@ -50,9 +50,9 @@
 | SC-001 三类能力 × 三市场的 9 个完整案例 | not_run | 9 个完整研究产物及逐项验收 | `fixtures/scenarios/manifest.json` 仅为 synthetic 映射 |
 | SC-002 8 类异常 | not_run | 每类执行记录、补证尝试及后续动作 | manifest 仅登记 8 类；尚无运行证据 |
 | SC-003 可追溯性 | not_run | 关键事实、价位和因子结果的来源／时间／口径／计算定位 | 等待各故事产物 |
-| SC-004 三类专员隔离执行 | blocked | 目标 Grok 环境、产品版本、可见模型信息和实际交付 | T001 环境不可访问；提示词文件不能替代实测 |
+| SC-004 三类专员隔离执行 | blocked | 目标 Grok 环境、产品版本、可见模型信息和实际交付 | T001 已完成替换前环境清点；新 Bot 实际部署后的 prompt/Skill 加载、隔离执行和交付仍未实测 |
 | SC-005 确定性计算可复查 | not_run | 预先声明精度、冻结输入和重复计算结果 | 等待计算任务及 fixtures |
-| SC-006 既有环境定时／并发／重跑／只读持仓 | blocked | 原生定时、两个并发范围、失败重跑、手机 PC 同结果、只读持仓进入输入 | T001/T002 blocked；没有 native/live 证据 |
+| SC-006 既有环境定时／并发／重跑／只读持仓 | blocked | 原生定时、两个并发范围、失败重跑、手机 PC 同结果、只读持仓进入输入 | T002 已取得 IBKR Flex 部分只读快照和长桥直连 SDK 账户／持仓 live 证据，但完整账户覆盖、长桥项目适配器、自选、原生定时、并发、重跑及手机/PC 同结果仍未验证 |
 | SC-007 复盘、记忆和实用性 | not_run | 至少 3 条复盘、压缩／失效／再注入及三类记忆场景对照 | memory manifest 仅为 synthetic 映射 |
 | SC-008 零订单与零敏感泄露 | not_run | 全验收运行的操作及公开产物审计 | 本骨架未执行产品或金融操作 |
 

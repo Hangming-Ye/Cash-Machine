@@ -18,12 +18,16 @@
 
 目标：核对现有环境和数据；不重新初始化 Git，不动 archive，不扩供应商。
 
-- [ ] T001 清点已有 Grok Bot／Routine、Skill／终端入口、云端 Python、项目路径及职责，生成 `private: config/bot-mapping.json` 和 `private: data/preflight/environment.md`；记录可见信息与不可见项，不创建新生产 Bot、调度器或回调。
-- [ ] T002 使用当前云端已有只读通道探测六类来源、港股历史、复权／PIT、研报／社交、自选声明冲突，记录 `private: data/preflight/source-coverage.json`，更新 `specs/001-investment-research-framework/data-sources.md` 的脱敏事实；列明 G-01—G-08 哪些影响完整案例，可追溯导出／公开序列导入是否可行，不能伪称 live 成功（依赖 T001）。
+- [X] T001 清点已有 Grok Bot／Routine、Skill／终端入口、云端 Python、项目路径及职责，生成 `private: config/bot-mapping.json` 和 `private: data/preflight/environment.md`；记录可见信息与不可见项，不创建新生产 Bot、调度器或回调。
+- [X] T002 使用当前云端已有只读通道探测六类来源、港股历史、复权／PIT、研报／社交、自选声明冲突，记录 `private: data/preflight/source-coverage.json`，更新 `specs/001-investment-research-framework/data-sources.md` 的脱敏事实；列明 G-01—G-08 哪些影响完整案例，可追溯导出／公开序列导入是否可行，不能伪称 live 成功（依赖 T001）。
 - [X] T003 建立新包 `src/cash_research/__init__.py`、`pyproject.toml`、`uv.lock` 和 `config/settings.example.json`，按已批准 Python／依赖组合固定兼容版本及入口；`uv sync --locked` 可复建，示例无秘密，不导入归档作为活动应用；参考 T001 环境记录，云端不可访问时仍按已批准 Python 3.12 建立离线工程，现场兼容验证留在 T016。
 - [X] T004 [P] 在 `fixtures/scenarios/manifest.json`、`fixtures/README.md` 和 `tests/conftest.py` 建立三市场×三类研究、八类异常及记忆样例映射；在 `scripts/run_fixtures.py` 建立仅供验证使用的 runner 骨架，分步调用 CLI、填回返回 ID／版本、保留逐步结果；在 `specs/001-investment-research-framework/acceptance.md` 创建未执行／受阻也可更新的验收映射骨架，虚构资料标 synthetic（依赖 T003）。
 
 **Checkpoint**：T001/T002 的完成表示已取得可验证记录，不要求所有源无缺口。账户或环境不可访问时，相应现场任务保持未完成；独立本地任务可继续。数据缺口只阻塞依赖该数据的完整案例，不冻结其他模块，也不允许最终验收假通过。
+
+**T001 audit evidence**：2026-09-22 检查原生 Grok UI 0.57.1，可见既有云端／源码路径；私有 `data/preflight/t001-native/config/bot-mapping.json` 与 `data/preflight/t001-native/data/preflight/environment.md` 保存替换前 Bot/Routine 快照及环境清点。软件开发工程师 Bot 自报 Debian 13、`/usr/bin/python3` 3.13.5、`/usr/local/bin/uv` 0.12.15、`/home/box/agent-data/managed-skills/skills` 下 44 个托管 Skill 文件且 workflows 为空，未取得独立原始命令日志。新 Bot 实际部署访问、Skill 调用和完整 Routine 登记留 T016 验证。Bot 违反只读要求，以 `uv run` 探测在旧源码根 `/workspace/sec-analysis-src/sec-analysis` 创建 `.venv` 并获取 build dependencies；完整改动范围及完成程度未知，未授权或执行清理。未创建生产 Bot、调度器或回调。
+
+**T002 audit evidence**：2026-09-22 以显式受保护配置对六个既有来源执行本地只读 live 探测，私有 `data/preflight/t002-local/source-coverage.json` 记录 `recorded_with_gaps`。Finnhub、Tiingo、FMP stable、AKShare、IBKR Flex 与长桥 OAuth 均取得成功、部分成功或明确错误证据；长桥直连 SDK 账户与持仓读取成功，但项目适配器仍缺受保护账户引用且自选未验证。港股 00700 原始／qfq 各导出 260 行，可追溯导入但不证明 PIT／公司行动完整；G-01—G-08 均保留影响说明。未新增供应商、未调用订单写接口、未记录凭证值。
 
 **T003 audit evidence**：Windows 离线工程执行 `uv sync --locked`，同步 25 packages 且退出码 0；`cash_research` 与计划中的核心依赖导入成功。该证据不替代 T016 的云端兼容和原生入口验证。
 
@@ -67,7 +71,7 @@
 - [X] T015 [US4] 在 `scripts/install.ps1`、`docs/deployment.md` 明确开发机打包、云机 uv 安装和版本回滚的手工路径；代码／锁文件可复建，秘密和运行数据不打包，步骤只操作项目目录，不加自愈进程（依赖 T013、T014）。
 - [ ] T016 [US4] 部署当前切片到测试 root，按 `docs/deployment.md` 在现有 Bot 建禁用计划的临时测试 Routine，验证新会话／Test run／交接、两任务归属和失败重跑；在 `private: data/validation/us4-entry.md` 记录实际读写及手机 PC 结果，核对生产资料未改，失败项保持未完成（依赖 T015、T001）。
 
-**T012 offline evidence**：主 agent 审核七个 prompt／加载清单文件并接受离线迁移内容；实际 Bot 映射、已加载版本和原生入口尚因 T001 未验证，因此 T012 保持未完成，等待现场证据。
+**T012 offline evidence**：主 agent 审核七个 prompt／加载清单文件并接受离线迁移内容；T001 已提供替换前 Bot 快照和 Skill 路径清点，已加载版本和原生入口仍待 T016，因此 T012 保持未完成。
 
 **T013/T014 audit evidence**：主 agent 审核实际 Skill／模板／复核文档和静态路径，并完成语义 diff 检查后接受离线实现。证据不替代 T016 的原生入口、手机／PC 与专员交接验证。
 
