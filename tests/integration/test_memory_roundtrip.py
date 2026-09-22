@@ -206,38 +206,174 @@ def test_normal_query_exact_id_and_review_partitions_use_real_packet_content(
     assert cross["items"][0]["review_condition"]
     assert cross["items"][0]["counterexamples"]
 
-    original_source = _source(tmp_path, "old-deep-input", T1)
-    monkeypatch.setattr(memory, "_utc_now", lambda: T1)
-    assert _apply(tmp_path, "deep-original", _topic("deep-revision", original_source, "Original assumption.", 0))[0] == 0
-    original_envelope, original_content, _ = _recall(tmp_path, "original-packet", _request("original-packet", mode="historical", as_of=T1, topic_ids=["deep-revision"]))
+
+def test_deep_analysis_revision_fixture_via_cli(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import cash_research.memory as memory
+
+    payload = json.loads(
+        (ROOT / "fixtures/scenarios/deep-analysis-revision/cases.json").read_text(encoding="utf-8")
+    )
+    cases = {case["id"]: case for case in payload["cases"]}
+    for ref, value in payload["sources"].items():
+        _write(tmp_path / ref, value)
+
+    later_formed = cases["later-formed-summary-old-material"]
+    monkeypatch.setattr(
+        memory,
+        "_utc_now",
+        lambda: datetime.fromisoformat(later_formed["summary_known_at"].replace("Z", "+00:00")),
+    )
+    assert (
+        _apply(
+            tmp_path,
+            "later-formed",
+            _topic("revision-later-formed", "source-old.json", "Old source summarized later.", 0),
+        )[0]
+        == 0
+    )
+    envelope, content, _ = _recall(
+        tmp_path,
+        "later-formed",
+        _request(
+            "later-formed",
+            mode=later_formed["mode"],
+            as_of=datetime.fromisoformat(later_formed["as_of"].replace("Z", "+00:00")),
+            topic_ids=["revision-later-formed"],
+        ),
+    )
+    assert content["items"] == []
+    assert later_formed["expected"]["selected"] == []
+    assert "formed_after_cutoff:topics:revision-later-formed" in _packet(tmp_path, envelope)["exclusions"]
+
+    missing = cases["missing-historical-version"]
+    topic_id = "missing-chain"
+    for version, stamp in sorted(
+        ((int(key), value) for key, value in missing["version_known_at"].items()),
+        key=lambda item: item[0],
+    ):
+        monkeypatch.setattr(
+            memory,
+            "_utc_now",
+            lambda stamp=stamp: datetime.fromisoformat(stamp.replace("Z", "+00:00")),
+        )
+        proposal = _topic(topic_id, "source-old.json", f"Thesis version {version}.", version - 1)
+        assert _apply(tmp_path, f"missing-v{version}", proposal)[0] == 0
+    (tmp_path / f"data/topics/{topic_id}/versions/{missing['missing_version']}.json").unlink()
+    current_thesis = json.loads(
+        (tmp_path / f"data/topics/{topic_id}/versions/3.json").read_text(encoding="utf-8")
+    )["current_thesis"]
+    request_path = _write(
+        tmp_path / "requests/missing-historical.json",
+        _request(
+            "missing-historical",
+            mode=missing["mode"],
+            as_of=datetime.fromisoformat(missing["as_of"].replace("Z", "+00:00")),
+            topic_ids=[topic_id],
+        ),
+    )
+    code, failed = _invoke(tmp_path, ["memory", "recall", "--request", str(request_path)])
+    assert code != 0
+    assert failed["status"] == "error"
+    artifacts = failed.get("artifacts") or []
+    for item in artifacts:
+        if item.get("type") != "memory_content":
+            continue
+        recovered = json.loads((tmp_path / item["path"]).read_text(encoding="utf-8"))
+        assert current_thesis not in json.dumps(recovered)
+
+    review_case = cases["review-frozen-versus-later"]
+    review_as_of = datetime.fromisoformat(review_case["as_of"].replace("Z", "+00:00"))
+    review_at = datetime.fromisoformat(review_case["review_at"].replace("Z", "+00:00"))
+    later_stamp = datetime.fromisoformat(payload["sources"]["source-later.json"]["available_at"].replace("Z", "+00:00"))
+    monkeypatch.setattr(memory, "_utc_now", lambda: review_as_of)
+    original_proposal = _topic("review-topic", "source-old.json", "Original assumption.", 0)
+    assert _apply(tmp_path, "review-original", original_proposal)[0] == 0
+    original_envelope, _, _ = _recall(
+        tmp_path,
+        "review-original-packet",
+        _request("review-original-packet", mode="historical", as_of=review_as_of, topic_ids=["review-topic"]),
+    )
     packet_id = _packet(tmp_path, original_envelope)["packet_id"]
-    draft = {
-        "decision_id": "draft",
-        "security_or_topic": "synthetic deep revision",
-        "as_of": T1.isoformat(),
-        "label": "watch",
-        "reason_refs": [],
-        "price_or_conditions": None,
-        "price_or_conditions_reason": "No price conclusion.",
-        "horizon": "one year",
-        "risks": ["Assumption may change."],
-        "invalidators": ["Contrary evidence."],
-        "memory_packet_refs": [packet_id],
-    }
-    _write(tmp_path / "decision.json", draft)
+    _write(
+        tmp_path / "decision.json",
+        {
+            "decision_id": "draft",
+            "security_or_topic": "synthetic deep revision",
+            "as_of": review_as_of.isoformat(),
+            "label": "watch",
+            "reason_refs": [],
+            "price_or_conditions": None,
+            "price_or_conditions_reason": "No price conclusion.",
+            "horizon": "one year",
+            "risks": ["Assumption may change."],
+            "invalidators": ["Contrary evidence."],
+            "memory_packet_refs": [packet_id],
+        },
+    )
     decision = archive_artifact(root=tmp_path, draft_ref="decision.json", record_type="Decision")
-    later_source = _source(tmp_path, "later-deep-input", T3)
-    monkeypatch.setattr(memory, "_utc_now", lambda: T3)
-    assert _apply(tmp_path, "deep-later", _topic("deep-revision", later_source, "Changed assumption; recompute dependency.", 1))[0] == 0
-    review_request = {
-        **_request("deep-review", mode="review", as_of=T1, topic_ids=["deep-revision"], query="recompute changed assumption"),
-        "review_at": T4.isoformat(),
-        "decision_id": decision.record_id,
-    }
-    _, review, _ = _recall(tmp_path, "deep-review", review_request)
-    assert "Original assumption." in json.dumps(review["original_inputs"])
-    assert review["later_facts_and_lessons"][0]["current_thesis"] == "Changed assumption; recompute dependency."
-    assert "Changed assumption" not in json.dumps(review["original_inputs"])
+    later_proposal = _topic("review-topic", "source-old.json", "Revised assumption after counterevidence.", 1)
+    later_proposal["opposing_refs"] = ["source-later.json"]
+    later_proposal["open_questions"] = ["Recalculate dependent valuation under the revised assumption."]
+    later_proposal["next_checks"] = ["Rerun the affected dependency chain."]
+    monkeypatch.setattr(memory, "_utc_now", lambda: later_stamp)
+    assert _apply(tmp_path, "review-later", later_proposal)[0] == 0
+    _, review, _ = _recall(
+        tmp_path,
+        "deep-review",
+        {
+            **_request(
+                "deep-review",
+                mode=review_case["mode"],
+                as_of=review_as_of,
+                topic_ids=["review-topic"],
+                query="recompute changed assumption",
+            ),
+            "review_at": review_at.isoformat(),
+            "decision_id": decision.record_id,
+        },
+    )
+    original_blob = json.dumps(review["original_inputs"])
+    later_blob = json.dumps(review["later_facts_and_lessons"])
+    assert packet_id in original_blob
+    assert "Original assumption." in original_blob
+    assert review["later_facts_and_lessons"][0]["current_thesis"] == later_proposal["current_thesis"]
+    assert "source-later.json" in later_blob
+    assert "Recalculate dependent valuation under the revised assumption." in later_blob
+    assert later_proposal["current_thesis"] not in original_blob
+    assert "source-later.json" not in original_blob
+    assert "Recalculate dependent valuation under the revised assumption." not in original_blob
+
+    budget_case = cases["budget-index-fallback"]
+    monkeypatch.setattr(memory, "_utc_now", lambda: T1)
+    budget_lesson = _lesson("budget-retention", "source-old.json", "usable", 0)
+    budget_lesson["check_or_method"] = "x" * 1000
+    budget_lesson["applies_when"] = "condition retained"
+    budget_lesson["counterexamples"] = ["counterevidence retained"]
+    assert _apply(tmp_path, "budget-lesson", budget_lesson)[0] == 0
+    _, budget_content, _ = _recall(
+        tmp_path,
+        "budget-fallback",
+        {
+            **_request(
+                "budget-fallback",
+                mode=budget_case["mode"],
+                lesson_ids=["budget-retention"],
+                query="budget",
+            ),
+            "budget": budget_case["budget"],
+        },
+    )
+    assert budget_content["items"] == []
+    index_path = tmp_path / budget_content["full_index_ref"]
+    assert index_path.is_file()
+    index = json.loads(index_path.read_text(encoding="utf-8"))
+    memory_ref = index["items"][0]["memory_ref"]
+    version = json.loads((tmp_path / memory_ref).read_text(encoding="utf-8"))
+    assert version["applies_when"] == "condition retained"
+    assert version["source_refs"] == ["source-old.json"]
+    assert version["counterexamples"] == ["counterevidence retained"]
 
 
 def test_missing_and_tampered_archived_sources_cannot_masquerade_as_usable(
@@ -290,3 +426,57 @@ def test_missing_and_tampered_archived_sources_cannot_masquerade_as_usable(
     assert code == 3
     assert failed["status"] == "error"
     assert failed["error"]["message"] == "operation failed in its external runtime"
+
+
+def test_decision_without_files_hash_is_not_clean_usable_memory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import cash_research.memory as memory
+
+    monkeypatch.setattr(memory, "_utc_now", lambda: T2)
+    _write(
+        tmp_path / "decision.json",
+        {
+            "decision_id": "draft",
+            "security_or_topic": "unknown availability source",
+            "as_of": T1.isoformat(),
+            "label": "watch",
+            "reason_refs": [],
+            "price_or_conditions": None,
+            "price_or_conditions_reason": "No price conclusion.",
+            "horizon": "one year",
+            "risks": [],
+            "invalidators": [],
+            "memory_packet_refs": [],
+        },
+    )
+    decision = archive_artifact(root=tmp_path, draft_ref="decision.json", record_type="Decision")
+    assert (
+        _apply(
+            tmp_path,
+            "unknown-availability",
+            _topic("unknown-availability", decision.record_id, "Must not look clean.", 0),
+        )[0]
+        == 0
+    )
+    manifest_path = tmp_path / f"data/records/{decision.record_id}/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert isinstance(manifest.get("archived_at"), str)
+    del manifest["files"]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    envelope, content, _ = _recall(
+        tmp_path,
+        "unknown-availability",
+        _request("unknown-availability", as_of=AFTER_ARCHIVE, topic_ids=["unknown-availability"]),
+    )
+    assert content["items"] == []
+    packet = _packet(tmp_path, envelope)
+    assert any(
+        item.startswith(f"unknown_source_availability:{decision.record_id}")
+        for item in packet["exclusions"]
+    )
+    assert any(
+        item.startswith(f"source_available_at_unknown:{decision.record_id}")
+        for item in envelope["gaps"]
+    )

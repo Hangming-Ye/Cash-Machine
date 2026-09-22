@@ -41,6 +41,7 @@
 | T051 | pass | Windows 离线记忆检索 | 主 agent 审核 metadata／temporal／dedupe 与正反证券匹配；16 passed 最终聚焦，前一修订 29 models／59 memory＋source；无 native reinjection 结论 |
 | T052 | pass | Windows 离线记忆方法 | 主 agent 审核 consolidation／dedupe／compression／apply API 文本；packaging 4 passed 及 static checks；无语义效果结论 |
 | T053 | pass | Windows 离线复盘方法 | 主 agent 审核 retrospective／Review template／archive request 文本；packaging 4 passed 及 static checks；无 native Review 流程结论 |
+| T054 | pass | Windows 离线记忆往返 | 主 agent 审核 CLI roundtrip 与 deep-analysis fixture 等价；6 passed；无 native reinjection 结论 |
 | T043 | pass | Windows 离线时间对齐 | 主 agent 审核完整 A／B／C 实现及最终公司行动出处修复；最终聚焦 18 passed，最终出处修复前相关计算／契约回归 159 passed；仅证明合成输入上的时点、修订、时段及复权资格检查，不证明 live 数据具备 PIT 完整性 |
 
 ## SC-001—SC-008

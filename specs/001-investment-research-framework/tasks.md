@@ -192,7 +192,9 @@
 - [X] T051 [P] [US6] 完善 `src/cash_research/memory.py` 的别名／主题／方法检索、按 known_at 与来源 available_at 的截止时点版本选择、当时有效性及复盘两区隔离和材料预算，无法容纳关键条件时返回索引与回查路径；通过 T050 的检索检查，不将无命中视为读取失败（依赖 T050）。
 - [X] T052 [P] [US6] 完善 `bot-kit/skills/research-memory/SKILL.md` 的提炼、去重、保留反证与条件、按任务选择压缩及实际使用说明；无变化不重复创造教训，单次成败不能升级为通用规则（依赖 T050）。
 - [X] T053 [P] [US6] 改写 `bot-kit/tasks/retrospective.md` 与 `bot-kit/templates/review.md`，明确到期／触发检查、当时依据与后来事实分离、错误归因及下一验证点；明确原判断与后续事实两区、使用原始 memory_packet_refs，复盘草稿经 check artifact --archive 取得 Review ID 后再写经验；不新建复盘调度器（依赖 T050）。
-- [ ] T054 [US6] 在 `tests/integration/test_memory_roundtrip.py` 验证摘要版本冲突、记忆失效、来源引用、期限与现行指令优先；将 T051—T053 集成到 `bot-kit/skills/research-entry/SKILL.md`，所有研究方法共享同一读写能力（依赖 T051—T053、T032）。
+- [X] T054 [US6] 在 `tests/integration/test_memory_roundtrip.py` 验证摘要版本冲突、记忆失效、来源引用、期限与现行指令优先；将 T051—T053 集成到 `bot-kit/skills/research-entry/SKILL.md`，所有研究方法共享同一读写能力（依赖 T051—T053、T032）。
+
+**T054 audit evidence**：主 agent 审核 CLI 记忆往返：版本冲突保留历史后再合并、失效经验不进入当前检索、来源缺失与归档篡改失败、无 files hash 的 Decision 不得作为干净可用记忆、deep-analysis fixture 的形成时点排除、缺版本失败、冻结原 packet 与后期反证分区、预算索引仍可回读条件／来源／反例。`tests/integration/test_memory_roundtrip.py` 6 passed，退出码 0。research-entry 已通过 research-memory 共用同一读写路径，含现行指令优先、expiry、no_change 与冲突后按新 expected_version 合并。证据仅为 Windows 离线合成 CLI，不证明原生再注入或复盘实用性。
 - [ ] T055 [US6] 更新云端测试切片，对三类任务执行有／无记忆对照与新会话／Routine／交接检查，保存 `private: data/validation/us6-memory.md`；核对实际材料与研究检查行为，不能只凭 Bot 自称已读取通过（依赖 T054、T016、T038、T048）。
 - [ ] T056 [US6] 用至少三条判断完成到期或按需复盘，在 `private: data/validation/us6-reviews.md` 留下原判断→后续事实→经验→后续任务采用／拒绝证据；不足到期条件不假判成功，引用弱或失效经验不冒充事实（依赖 T055、T053）。
 
