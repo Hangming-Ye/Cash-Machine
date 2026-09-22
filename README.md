@@ -4,8 +4,9 @@
 
 ## 当前阶段
 
-项目已初始化，intent已对齐；尚未生成正式功能spec，也没有新框架的运行实现。
+项目已初始化，intent与spec001已形成；plan已获用户批准，已生成任务清单。尚无新框架运行实现。
 
+- **当前规格与计划**：[spec001](specs/001-investment-research-framework/spec.md)、[plan](specs/001-investment-research-framework/plan.md)、[新增选择审批表](specs/001-investment-research-framework/plan-assumptions.md)。
 - **需求依据**：[docs/intent.md](docs/intent.md)。
 - **调研入口**：[RESEARCH_INDEX_20260920.md](RESEARCH_INDEX_20260920.md)。
 - **候选方案**：[BOT_OPERATING_SPEC.md](BOT_OPERATING_SPEC.md)、[架构研究](FINANCIAL_RESEARCH_ARCHITECTURE_20260920.md)、[bot-kit](bot-kit/README.md)。这些是设计输入，不是已批准spec。
@@ -27,7 +28,7 @@
 | `bot-kit/` | 候选岗位指令、任务卡和输出契约 |
 | `archive/` | 仅供参考的旧实现 |
 
-`.specify/memory/constitution.md`目前是官方占位模板，尚未制定或批准项目constitution。接下来按intent形成constitution及功能spec，再进入plan/tasks；不把旧方案中的岗位数量、技术栈或执行上限直接冻结为需求。
+`.specify/memory/constitution.md`已整理用户明确的约束，不批准plan新增技术选择。任务清单见 [tasks.md](specs/001-investment-research-framework/tasks.md)，尚未执行实现；旧方案的固定岗位数、流程或上限不是现行约束。
 
 ## Git与本地配置
 
