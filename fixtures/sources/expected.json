@@ -1,0 +1,389 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "evidence_level": "synthetic_contract",
+  "adapter_contract": {
+    "construction": "adapter(settings, client=injected_read_only_client)",
+    "call": "fetch(request: Mapping[str, object], *, output_ref: str) -> Mapping[str, object]",
+    "required_request_keys": ["request_id", "source", "operation", "subject", "as_of", "parameters", "required_fields"],
+    "required_result_keys": ["source_result", "raw_payload", "normalized", "evidence", "gaps"],
+    "persistence": "output_ref is a router-provided safe relative prospective raw path; T024 persists raw_payload there before reporting success"
+  },
+  "success_cases": {
+    "quote": {
+      "request": {
+        "request_id": "fixture-source-quote",
+        "source": "finnhub",
+        "operation": "quote",
+        "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNQ", "currency": "USD"},
+        "as_of": "2026-01-15T15:30:00Z",
+        "parameters": {},
+        "required_fields": ["current_price", "currency", "observed_at"]
+      },
+      "result": {
+        "source_result": {
+          "source": "finnhub",
+          "operation": "quote",
+          "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNQ", "currency": "USD"},
+          "observed_at": null,
+          "retrieved_at": "2026-01-15T15:30:02Z",
+          "available_at": null,
+          "coverage": "one synthetic US quote snapshot; provider timestamp absent",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {
+            "observed_at": "synthetic provider payload omitted a documented quote timestamp",
+            "available_at": "quote availability time was not separately supplied"
+          }
+        },
+        "raw_payload": {"c": 101.25, "d": 1.25, "dp": 1.25, "h": 102.0, "l": 99.5, "o": 100.0, "pc": 100.0},
+        "normalized": {
+          "raw_locator": "/success_cases/quote/result/raw_payload",
+          "actual_source": "finnhub:/quote",
+          "identity": {"market": "US", "exchange": "XNAS", "symbol": "SYNQ", "currency": "USD"},
+          "current_price": {"value": "101.25", "unit": "currency_per_share", "currency": "USD"},
+          "provider_timestamp": null
+        },
+        "evidence": [],
+        "gaps": [{
+          "gap_id": "gap-synthetic-quote-time",
+          "request_id": "fixture-source-quote",
+          "required_content": "provider quote observation and availability time",
+          "attempts": [{"source": "finnhub:/quote", "at": "2026-01-15T15:30:02Z", "result": "timestamp fields absent"}],
+          "impact": "quote can be used only as a retrieval-time snapshot",
+          "next_action": "retain null times unless the live provider returns verified fields"
+        }]
+      }
+    },
+    "bars": {
+      "request": {
+        "request_id": "fixture-source-bars",
+        "source": "tiingo",
+        "operation": "bars",
+        "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNB", "currency": "USD"},
+        "as_of": "2026-01-15T23:00:00Z",
+        "parameters": {"start_date": "2026-01-13", "end_date": "2026-01-14", "bar_interval": "1d", "price_basis": "raw"},
+        "required_fields": ["raw_ohlcv", "adjusted_ohlcv", "div_cash", "split_factor", "market_date"]
+      },
+      "result": {
+        "source_result": {
+          "source": "tiingo",
+          "operation": "bars",
+          "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNB", "currency": "USD"},
+          "observed_at": null,
+          "retrieved_at": "2026-01-15T23:00:01Z",
+          "available_at": null,
+          "coverage": "two synthetic daily sessions; one raw volume is missing",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {
+            "observed_at": "daily rows provide market dates rather than observation instants",
+            "available_at": "provider correction cadence is not a row-specific availability timestamp"
+          }
+        },
+        "raw_payload": [
+          {"date": "2026-01-13T00:00:00.000Z", "open": 10.0, "high": 11.0, "low": 9.5, "close": 10.5, "volume": 1000, "adjOpen": 5.0, "adjHigh": 5.5, "adjLow": 4.75, "adjClose": 5.25, "adjVolume": 2000, "divCash": 0.0, "splitFactor": 2.0},
+          {"date": "2026-01-14T00:00:00.000Z", "open": 5.3, "high": 5.6, "low": 5.1, "close": 5.5, "volume": null, "adjOpen": 5.3, "adjHigh": 5.6, "adjLow": 5.1, "adjClose": 5.5, "adjVolume": 2100, "divCash": 0.1, "splitFactor": 1.0}
+        ],
+        "normalized": {
+          "raw_locator": "/success_cases/bars/result/raw_payload",
+          "actual_source": "tiingo:/tiingo/daily/{ticker}/prices",
+          "bar_interval": "1d",
+          "market_timezone": "America/New_York",
+          "price_basis": "raw",
+          "volume_basis": "raw",
+          "revision_status": "provider history may revise after corporate actions",
+          "rows": [
+            {"market_date": "2026-01-13", "open": 10.0, "high": 11.0, "low": 9.5, "close": 10.5, "volume": 1000, "div_cash": 0.0, "split_factor": 2.0},
+            {"market_date": "2026-01-14", "open": 5.3, "high": 5.6, "low": 5.1, "close": 5.5, "volume": null, "volume_unknown_reason": "raw volume missing; adjusted volume was not substituted", "div_cash": 0.1, "split_factor": 1.0}
+          ]
+        },
+        "evidence": [],
+        "gaps": [{
+          "gap_id": "gap-synthetic-bars-volume",
+          "request_id": "fixture-source-bars",
+          "required_content": "raw volume for every requested market date",
+          "attempts": [{"source": "tiingo:EOD", "at": "2026-01-15T23:00:01Z", "result": "one raw volume null; adjusted volume retained separately"}],
+          "impact": "raw-volume calculations exclude the affected row",
+          "next_action": "retry the same source or limit calculations without substituting adjusted volume"
+        }]
+      }
+    },
+    "news": {
+      "request": {
+        "request_id": "fixture-source-news",
+        "source": "finnhub",
+        "operation": "news",
+        "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNN", "currency": "USD"},
+        "as_of": "2026-01-15T16:00:00Z",
+        "parameters": {"from": "2026-01-14", "to": "2026-01-15"},
+        "required_fields": ["headline", "published_at", "source", "url"]
+      },
+      "result": {
+        "source_result": {
+          "source": "finnhub",
+          "operation": "news",
+          "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNN", "currency": "USD"},
+          "observed_at": "2026-01-15T14:00:00Z",
+          "retrieved_at": "2026-01-15T16:00:02Z",
+          "available_at": null,
+          "coverage": "one synthetic company-news item in requested date range",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {"available_at": "aggregator ingestion time was not supplied"}
+        },
+        "raw_payload": [{"id": 9001, "datetime": 1768485600, "headline": "Synthetic issuer announces capacity update", "summary": "Synthetic summary.", "source": "Synthetic Wire", "url": "https://example.test/news/9001", "related": "SYNN", "category": "company"}],
+        "normalized": {"raw_locator": "/success_cases/news/result/raw_payload/0", "actual_source": "finnhub:/company-news", "truncated": false},
+        "evidence": [{
+          "evidence_id": "evidence-synthetic-news-9001",
+          "source_ref": "fixtures/sources/expected.json",
+          "locator": "/success_cases/news/result/raw_payload/0",
+          "published_at": "2026-01-15T14:00:00Z",
+          "retrieved_at": "2026-01-15T16:00:02Z",
+          "available_at": null,
+          "content_kind": "third_party_view",
+          "claim": "Synthetic issuer announced a capacity update.",
+          "scope": "synthetic contract fixture only",
+          "units": [],
+          "limitations": ["fixture does not prove live coverage or article semantics"],
+          "unknown_reasons": {"available_at": "aggregator ingestion time was not supplied"}
+        }],
+        "gaps": []
+      }
+    },
+    "profile": {
+      "request": {
+        "request_id": "fixture-source-profile",
+        "source": "fmp_stable",
+        "operation": "profile",
+        "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNP", "currency": "USD"},
+        "as_of": "2026-01-15T17:00:00Z",
+        "parameters": {},
+        "required_fields": ["company_name", "exchange", "currency", "sector", "industry", "market_cap"]
+      },
+      "result": {
+        "source_result": {
+          "source": "fmp_stable",
+          "operation": "profile",
+          "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNP", "currency": "USD"},
+          "observed_at": null,
+          "retrieved_at": "2026-01-15T17:00:01Z",
+          "available_at": null,
+          "coverage": "one synthetic current profile snapshot",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "profile response has no snapshot timestamp", "available_at": "profile availability time was not supplied"}
+        },
+        "raw_payload": [{"symbol": "SYNP", "companyName": "Synthetic Profile Corp", "marketCap": 123456789, "lastDividend": 0.25, "currency": "USD", "exchange": "NASDAQ", "sector": "Technology", "industry": "Synthetic Devices", "ipoDate": "2020-01-02"}],
+        "normalized": {"raw_locator": "/success_cases/profile/result/raw_payload/0", "actual_source": "fmp:/stable/profile", "company_name": "Synthetic Profile Corp", "market_cap": {"value": "123456789", "unit": "currency", "currency": "USD"}, "last_dividend": {"value": "0.25", "unit": "currency_per_share", "currency": "USD"}},
+        "evidence": [],
+        "gaps": []
+      }
+    },
+    "statements": {
+      "request": {
+        "request_id": "fixture-source-statements",
+        "source": "fmp_stable",
+        "operation": "statements",
+        "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNS", "currency": "USD"},
+        "as_of": "2026-01-15T18:00:00Z",
+        "parameters": {"period": "annual", "statement_types": ["income", "balance", "cash"], "limit": 1},
+        "required_fields": ["reported_currency", "period_end", "filing_date", "accepted_date", "fiscal_year", "period", "raw_lines"]
+      },
+      "result": {
+        "source_result": {
+          "source": "fmp_stable",
+          "operation": "statements",
+          "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNS", "currency": "USD"},
+          "observed_at": null,
+          "retrieved_at": "2026-01-15T18:00:01Z",
+          "available_at": null,
+          "coverage": "one synthetic annual period for each of income, balance, and cash flow",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "period end is not an observation timestamp", "available_at": "acceptedDate lacks a verified timezone"}
+        },
+        "raw_payload": {
+          "income": [{"date": "2025-09-30", "symbol": "SYNS", "reportedCurrency": "USD", "cik": "0000000000", "filingDate": "2025-11-01", "acceptedDate": "2025-11-01 06:01:36", "fiscalYear": "2025", "period": "FY", "revenue": 1000, "netIncome": 100}],
+          "balance": [{"date": "2025-09-30", "symbol": "SYNS", "reportedCurrency": "USD", "cik": "0000000000", "filingDate": "2025-11-01", "acceptedDate": "2025-11-01 06:01:36", "fiscalYear": "2025", "period": "FY", "totalAssets": 2000, "totalLiabilities": 800}],
+          "cash": [{"date": "2025-09-30", "symbol": "SYNS", "reportedCurrency": "USD", "cik": "0000000000", "filingDate": "2025-11-01", "acceptedDate": "2025-11-01 06:01:36", "fiscalYear": "2025", "period": "FY", "operatingCashFlow": 180, "capitalExpenditure": -60}]
+        },
+        "normalized": {"raw_locator": "/success_cases/statements/result/raw_payload", "actual_source": "fmp:/stable/{statement}", "reported_currency": "USD", "period_end": "2025-09-30", "filing_date": "2025-11-01", "accepted_date_raw": "2025-11-01 06:01:36", "accepted_timezone": null, "fiscal_year": "2025", "period": "FY", "point_in_time_status": "not_proven_without_timezone_and_revision_history", "statement_types": ["income", "balance", "cash"]},
+        "evidence": [],
+        "gaps": [{
+          "gap_id": "gap-synthetic-statement-pit",
+          "request_id": "fixture-source-statements",
+          "required_content": "timezone-qualified acceptance time and revision history",
+          "attempts": [{"source": "fmp:stable statements", "at": "2026-01-15T18:00:01Z", "result": "acceptedDate has no timezone; no historical versions in fixture"}],
+          "impact": "fixture cannot support a historical point-in-time claim",
+          "next_action": "retain raw metadata and verify original filing/version evidence"
+        }]
+      }
+    },
+    "text_ingest": {
+      "request": {
+        "request_id": "fixture-source-text-ingest",
+        "source": "user_provided_material",
+        "operation": "text_ingest",
+        "subject": "synthetic industry note",
+        "as_of": "2026-01-15T19:00:00Z",
+        "parameters": {"path": "fixtures/sources/expected.json", "locator": "/success_cases/text_ingest/result/raw_payload", "content_kind": "third_party_view"},
+        "required_fields": ["published_at", "retrieved_at", "source_locator", "limitations"]
+      },
+      "result": {
+        "source_result": {
+          "source": "user_provided_material",
+          "operation": "text_ingest",
+          "security_or_topic": "synthetic industry note",
+          "observed_at": "2026-01-10T09:00:00Z",
+          "retrieved_at": "2026-01-15T19:00:00Z",
+          "available_at": "2026-01-10T09:00:00Z",
+          "coverage": "one complete synthetic text excerpt with locator",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "complete",
+          "errors": [],
+          "unknown_reasons": {}
+        },
+        "raw_payload": {"title": "Synthetic industry note", "published_at": "2026-01-10T09:00:00Z", "text": "Synthetic material for contract validation only."},
+        "normalized": {"raw_locator": "/success_cases/text_ingest/result/raw_payload", "actual_source": "user-provided file", "semantic_validation": "not_claimed"},
+        "evidence": [{
+          "evidence_id": "evidence-synthetic-text",
+          "source_ref": "fixtures/sources/expected.json",
+          "locator": "/success_cases/text_ingest/result/raw_payload",
+          "published_at": "2026-01-10T09:00:00Z",
+          "retrieved_at": "2026-01-15T19:00:00Z",
+          "available_at": "2026-01-10T09:00:00Z",
+          "content_kind": "third_party_view",
+          "claim": "The synthetic material states a capacity constraint.",
+          "scope": "one synthetic excerpt",
+          "units": [],
+          "limitations": ["archive and metadata validation do not prove the statement true"],
+          "unknown_reasons": {}
+        }],
+        "gaps": []
+      }
+    },
+    "series_ingest": {
+      "request": {
+        "request_id": "fixture-source-series-ingest",
+        "source": "user_provided_series",
+        "operation": "series_ingest",
+        "subject": {"market": "HK", "exchange": "XHKG", "symbol": "SYNH", "currency": "HKD"},
+        "as_of": "2026-01-15T20:00:00Z",
+        "parameters": {"path": "fixtures/sources/expected.json", "locator": "/success_cases/series_ingest/result/raw_payload", "bar_interval": "1d"},
+        "required_fields": ["schema", "coverage", "market_date", "currency", "unit", "adjustment_status"]
+      },
+      "result": {
+        "source_result": {
+          "source": "user_provided_series",
+          "operation": "series_ingest",
+          "security_or_topic": {"market": "HK", "exchange": "XHKG", "symbol": "SYNH", "currency": "HKD"},
+          "observed_at": null,
+          "retrieved_at": "2026-01-15T20:00:00Z",
+          "available_at": null,
+          "coverage": "two synthetic daily rows; adjustment and original publication time unknown",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": [],
+          "unknown_reasons": {"observed_at": "series contains market dates only", "available_at": "source publication time was not provided"}
+        },
+        "raw_payload": [{"date": "2026-01-13", "close": 50.0, "currency": "HKD"}, {"date": "2026-01-14", "close": 51.0, "currency": "HKD"}],
+        "normalized": {"raw_locator": "/success_cases/series_ingest/result/raw_payload", "actual_source": "user-provided numeric file", "bar_interval": "1d", "coverage_start": "2026-01-13", "coverage_end": "2026-01-14", "row_count": 2, "unit": "currency_per_share", "currency": "HKD", "adjustment_status": "unknown", "point_in_time_status": "not_proven"},
+        "evidence": [{
+          "evidence_id": "evidence-synthetic-series",
+          "source_ref": "fixtures/sources/expected.json",
+          "locator": "/success_cases/series_ingest/result/raw_payload",
+          "published_at": null,
+          "retrieved_at": "2026-01-15T20:00:00Z",
+          "available_at": null,
+          "content_kind": "calculation_result",
+          "claim": "The imported synthetic series contains two dated close values.",
+          "scope": "2026-01-13 through 2026-01-14; two rows",
+          "units": ["HKD/share"],
+          "limitations": ["adjustment status and point-in-time availability are unknown"],
+          "unknown_reasons": {"published_at": "source publication time was not provided", "available_at": "source availability time was not provided"}
+        }],
+        "gaps": [{
+          "gap_id": "gap-synthetic-series-adjustment",
+          "request_id": "fixture-source-series-ingest",
+          "required_content": "adjustment and corporate-action provenance",
+          "attempts": [{"source": "user-provided series", "at": "2026-01-15T20:00:00Z", "result": "not present in input schema"}],
+          "impact": "series cannot support adjusted-return or PIT validation",
+          "next_action": "obtain a traceable complete series with adjustment metadata"
+        }]
+      }
+    },
+    "partial_success": {
+      "request": {
+        "request_id": "fixture-source-partial",
+        "source": "akshare",
+        "operation": "news",
+        "subject": {"market": "CN", "exchange": "XSHG", "symbol": "600000", "currency": "CNY"},
+        "as_of": "2026-01-15T21:00:00Z",
+        "parameters": {"endpoints": ["primary", "fallback"]},
+        "required_fields": ["headline", "published_at", "actual_source"]
+      },
+      "result": {
+        "source_result": {
+          "source": "akshare",
+          "operation": "news",
+          "security_or_topic": {"market": "CN", "exchange": "XSHG", "symbol": "600000", "currency": "CNY"},
+          "observed_at": "2026-01-15T12:00:00+08:00",
+          "retrieved_at": "2026-01-15T21:00:01+08:00",
+          "available_at": null,
+          "coverage": "fallback returned one item; primary endpoint failed",
+          "payload_ref": "fixtures/sources/expected.json",
+          "quality": "limited",
+          "errors": ["primary_endpoint_failed"],
+          "unknown_reasons": {"available_at": "underlying fallback source did not expose ingestion time"}
+        },
+        "raw_payload": {"primary": null, "fallback": [{"title": "合成公告摘要", "time": "2026-01-15 12:00:00", "url": "https://example.test/cn/1"}]},
+        "normalized": {"raw_locator": "/success_cases/partial_success/result/raw_payload", "actual_source": "akshare:fallback-synthetic", "successful_endpoints": ["fallback"], "failed_endpoints": ["primary"]},
+        "evidence": [],
+        "gaps": [{
+          "gap_id": "gap-synthetic-partial-source",
+          "request_id": "fixture-source-partial",
+          "required_content": "primary and fallback source coverage",
+          "attempts": [{"source": "akshare:primary", "at": "2026-01-15T21:00:00+08:00", "result": "failed"}, {"source": "akshare:fallback", "at": "2026-01-15T21:00:01+08:00", "result": "one item"}],
+          "impact": "result is usable only as limited fallback coverage",
+          "next_action": "retain fallback evidence and retry or supplement the missing primary coverage"
+        }]
+      }
+    }
+  },
+  "data_error_cases": {
+    "wrong_security": {
+      "request": {"request_id": "fixture-error-wrong-security", "source": "finnhub", "operation": "quote", "subject": {"market": "US", "exchange": "XNAS", "symbol": "REQ", "currency": "USD"}, "as_of": "2026-01-15T15:30:00Z", "parameters": {}, "required_fields": ["identity"]},
+      "result": {"source_result": {"source": "finnhub", "operation": "quote", "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "REQ", "currency": "USD"}, "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "response identity did not match requested security", "payload_ref": "fixtures/sources/expected.json", "quality": "failed", "errors": ["wrong_security"], "unknown_reasons": {"observed_at": "mismatched response cannot establish requested security time", "available_at": "mismatched response rejected"}}, "raw_payload": {"symbol": "OTHER", "c": 1.0}, "normalized": {"raw_locator": "/data_error_cases/wrong_security/result/raw_payload", "error_reason": "invalid", "returned_identity": {"market": "US", "exchange": "XNAS", "symbol": "OTHER", "currency": "USD"}}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-wrong-security", "request_id": "fixture-error-wrong-security", "required_content": "data for requested security REQ", "attempts": [{"source": "finnhub:/quote", "at": "2026-01-15T15:30:01Z", "result": "returned OTHER"}], "impact": "payload rejected", "next_action": "resolve identity and retry"}]}
+    },
+    "unsupported": {
+      "request": {"request_id": "fixture-error-unsupported", "source": "tiingo", "operation": "quote", "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNU", "currency": "USD"}, "as_of": "2026-01-15T15:30:00Z", "parameters": {}, "required_fields": ["current_price"]},
+      "result": {"source_result": {"source": "tiingo", "operation": "quote", "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNU", "currency": "USD"}, "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "operation is outside the approved Tiingo EOD adapter", "payload_ref": null, "quality": "failed", "errors": ["unsupported"], "unknown_reasons": {"observed_at": "operation was not called", "available_at": "operation was not called"}}, "raw_payload": null, "normalized": {"raw_locator": null, "error_reason": "unsupported"}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-unsupported", "request_id": "fixture-error-unsupported", "required_content": "current quote", "attempts": [{"source": "tiingo", "at": "2026-01-15T15:30:01Z", "result": "unsupported operation"}], "impact": "no quote result", "next_action": "use an approved existing quote source"}]}
+    },
+    "unauthorized": {
+      "request": {"request_id": "fixture-error-unauthorized", "source": "fmp_stable", "operation": "profile", "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNA", "currency": "USD"}, "as_of": "2026-01-15T15:30:00Z", "parameters": {}, "required_fields": ["company_name"]},
+      "result": {"source_result": {"source": "fmp_stable", "operation": "profile", "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNA", "currency": "USD"}, "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "request rejected before usable payload", "payload_ref": null, "quality": "failed", "errors": ["unauthorized"], "unknown_reasons": {"observed_at": "no authorized response", "available_at": "no authorized response"}}, "raw_payload": null, "normalized": {"raw_locator": null, "error_reason": "unauthorized"}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-unauthorized", "request_id": "fixture-error-unauthorized", "required_content": "company profile", "attempts": [{"source": "fmp:/stable/profile", "at": "2026-01-15T15:30:01Z", "result": "unauthorized"}], "impact": "no source data", "next_action": "report permission gap without exposing credentials"}]}
+    },
+    "rate_limited": {
+      "request": {"request_id": "fixture-error-rate-limit", "source": "finnhub", "operation": "news", "subject": "synthetic market news", "as_of": "2026-01-15T15:30:00Z", "parameters": {"category": "general"}, "required_fields": ["headline"]},
+      "result": {"source_result": {"source": "finnhub", "operation": "news", "security_or_topic": "synthetic market news", "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "request was rate limited", "payload_ref": null, "quality": "failed", "errors": ["rate_limited"], "unknown_reasons": {"observed_at": "no usable response", "available_at": "no usable response"}}, "raw_payload": null, "normalized": {"raw_locator": null, "error_reason": "rate_limited", "retry_after": null}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-rate-limit", "request_id": "fixture-error-rate-limit", "required_content": "general news", "attempts": [{"source": "finnhub:/news", "at": "2026-01-15T15:30:01Z", "result": "rate limited; retry time absent"}], "impact": "news unavailable for this attempt", "next_action": "record the limit and retry simply when permitted"}]}
+    },
+    "empty": {
+      "request": {"request_id": "fixture-error-empty", "source": "finnhub", "operation": "news", "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNE", "currency": "USD"}, "as_of": "2026-01-15T15:30:00Z", "parameters": {"from": "2026-01-15", "to": "2026-01-15"}, "required_fields": ["headline"]},
+      "result": {"source_result": {"source": "finnhub", "operation": "news", "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNE", "currency": "USD"}, "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "valid empty response for the exact requested day", "payload_ref": "fixtures/sources/expected.json", "quality": "limited", "errors": [], "unknown_reasons": {"observed_at": "no items returned", "available_at": "no items returned"}}, "raw_payload": [], "normalized": {"raw_locator": "/data_error_cases/empty/result/raw_payload", "error_reason": "empty", "empty_is_failure": false}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-empty", "request_id": "fixture-error-empty", "required_content": "company news for requested day", "attempts": [{"source": "finnhub:/company-news", "at": "2026-01-15T15:30:01Z", "result": "valid empty array"}], "impact": "no article evidence; not a transport failure", "next_action": "continue independent work or broaden evidence channels when relevant"}]}
+    },
+    "stale": {
+      "request": {"request_id": "fixture-error-stale", "source": "akshare", "operation": "quote", "subject": {"market": "CN", "exchange": "XSHG", "symbol": "600001", "currency": "CNY"}, "as_of": "2026-01-15T15:30:00+08:00", "parameters": {"max_age_seconds": 300}, "required_fields": ["current_price", "observed_at"]},
+      "result": {"source_result": {"source": "akshare", "operation": "quote", "security_or_topic": {"market": "CN", "exchange": "XSHG", "symbol": "600001", "currency": "CNY"}, "observed_at": "2026-01-14T15:00:00+08:00", "retrieved_at": "2026-01-15T15:30:01+08:00", "available_at": "2026-01-14T15:00:00+08:00", "coverage": "synthetic quote older than requested freshness", "payload_ref": "fixtures/sources/expected.json", "quality": "limited", "errors": ["stale"], "unknown_reasons": {}}, "raw_payload": {"price": 9.9, "timestamp": "2026-01-14 15:00:00", "underlying_source": "synthetic-cn-source"}, "normalized": {"raw_locator": "/data_error_cases/stale/result/raw_payload", "error_reason": "stale", "actual_source": "akshare:synthetic-cn-source", "age_seconds": 88201}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-stale", "request_id": "fixture-error-stale", "required_content": "quote within 300 seconds", "attempts": [{"source": "akshare:synthetic-cn-source", "at": "2026-01-15T15:30:01+08:00", "result": "stale observation"}], "impact": "cannot support a current-price conclusion", "next_action": "retry or use another approved existing source"}]}
+    },
+    "revision_conflict": {
+      "request": {"request_id": "fixture-error-revision", "source": "fmp_stable", "operation": "statements", "subject": {"market": "US", "exchange": "XNAS", "symbol": "SYNR", "currency": "USD"}, "as_of": "2026-01-15T15:30:00Z", "parameters": {"period": "annual", "statement_types": ["income"], "limit": 2}, "required_fields": ["revision_identity", "accepted_date"]},
+      "result": {"source_result": {"source": "fmp_stable", "operation": "statements", "security_or_topic": {"market": "US", "exchange": "XNAS", "symbol": "SYNR", "currency": "USD"}, "observed_at": null, "retrieved_at": "2026-01-15T15:30:01Z", "available_at": null, "coverage": "two conflicting synthetic revisions for one fiscal period", "payload_ref": "fixtures/sources/expected.json", "quality": "limited", "errors": ["conflict"], "unknown_reasons": {"observed_at": "fiscal period is not observation time", "available_at": "revision ordering cannot be established from timezone-less acceptance values"}}, "raw_payload": [{"date": "2025-09-30", "acceptedDate": "2025-11-01 06:01:36", "revenue": 1000}, {"date": "2025-09-30", "acceptedDate": "2025-11-02 06:01:36", "revenue": 990}], "normalized": {"raw_locator": "/data_error_cases/revision_conflict/result/raw_payload", "error_reason": "conflict", "revision_status": "unresolved", "point_in_time_status": "not_proven"}, "evidence": [], "gaps": [{"gap_id": "gap-synthetic-revision-conflict", "request_id": "fixture-error-revision", "required_content": "ordered authoritative revision chain", "attempts": [{"source": "fmp:stable income statement", "at": "2026-01-15T15:30:01Z", "result": "two differing rows for one period"}], "impact": "statement cannot be selected for PIT analysis", "next_action": "preserve both versions and verify filing provenance before selection"}]}
+    }
+  }
+}

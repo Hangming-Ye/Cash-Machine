@@ -1,0 +1,30 @@
+{
+  "request_id": "fixture-evidence-ingest",
+  "source": "user_provided_material",
+  "operation": "text_ingest",
+  "subject": "synthetic qualification capacity",
+  "as_of": "2026-01-15T19:00:00Z",
+  "parameters": {
+    "path": "fixtures/ingest/synthetic-note.md",
+    "locator": "line:3",
+    "origin_url": "https://example.test/synthetic-capacity-note",
+    "source_name": "Synthetic Research Publisher",
+    "author": "Synthetic Analyst",
+    "organization": "Synthetic Research Publisher",
+    "access_scope": "public synthetic fixture",
+    "published_at": "2026-01-10T09:00:00Z",
+    "available_at": "2026-01-10T09:00:00Z",
+    "content_kind": "third_party_view",
+    "claim": "The synthetic note states that qualification capacity is constrained.",
+    "scope": "one complete synthetic note",
+    "limitations": ["synthetic fixture; ingest validation does not establish truth"],
+    "material_scope": "complete_document"
+  },
+  "required_fields": [
+    "published_at",
+    "available_at",
+    "source_locator",
+    "access_scope",
+    "limitations"
+  ]
+}
